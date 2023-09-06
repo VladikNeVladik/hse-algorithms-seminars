@@ -3,7 +3,7 @@
 
 build/dollar: dollar.c
 	@mkdir -p build
-	gcc dollar.c -o build/dollar
+	gcc dollar.c -Wall -Werror -o build/dollar
 
 run: build/dollar
 	@./build/dollar
