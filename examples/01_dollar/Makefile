@@ -1,14 +1,14 @@
 # No copyright. Vladislav Aleinik, 2023
 # The simplest Makefile possible.
 
-build: hello.c
+build/dollar: dollar.c
 	@mkdir -p build
-	gcc hello.c -o build/hello
+	gcc dollar.c -o build/dollar
 
-run: build/hello
-	@./build/hello
+run: build/dollar
+	@./build/dollar
 
 clean:
 	@rm -rf build
 
-.PHONY: build run clean
+.PHONY: run clean

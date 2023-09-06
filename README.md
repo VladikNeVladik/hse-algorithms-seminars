@@ -20,6 +20,18 @@
 compilation terminated.
 ```
 
+#### Система контроля версий Git
+Для установки стоит выполнить:
+```
+❯ sudo apt install git
+```
+
+Проверка работоспособности:
+```
+❯ git --version
+git version 2.25.1
+```
+
 #### Утилита для сборки проектов
 Для установки стоит выполнить:
 ```
@@ -31,6 +43,7 @@ compilation terminated.
 ❯ make
 make: *** No targets specified and no makefile found.  Stop.
 ```
+
 
 ### Mac OS
 
