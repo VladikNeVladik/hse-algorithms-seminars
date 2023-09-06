@@ -1,2 +1,12 @@
-*/build
+# Object files:
 *.o
+
+# Build files:
+build/
+
+# CTags printout:
+.tags
+
+# IDE trash:
+.vscode/
+.cache/
