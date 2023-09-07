@@ -44,7 +44,6 @@ git version 2.25.1
 make: *** No targets specified and no makefile found.  Stop.
 ```
 
-
 ### Mac OS
 
 В качестве пакетного менеджера можно использовать [Homebrew](https://docs.brew.sh/Homebrew-on-Linux).
@@ -77,4 +76,4 @@ make: *** No targets specified and no makefile found.  Stop.
 
 Рекомендации:
 - Можно применять [Windows Subsystem for Linux](https://learn.microsoft.com/en-us/windows/wsl/install) и пользоваться командной строкой так же, как и на UNIX-совместимой операционной системе.
-- Можно установить [VS Code](https://code.visualstudio.com/) и компилировать код встроенным компилятором IDE.
+- Можно установить [VS Code](https://code.visualstudio.com/) и компилировать код встроенным компилятором IDE. [Туториал по сборке минимального проекта под C](https://code.visualstudio.com/docs/languages/cpp).
