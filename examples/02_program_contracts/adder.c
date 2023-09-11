@@ -9,7 +9,7 @@ int main(void)
     int num_inputs = scanf("%hd\n%hd", &num1, &num2);
     if (num_inputs < 2)
     {
-        printf("adder: expected input \"<addentum1> <addentum2>\\n\"\n");
+        printf("adder: expected input \"<addentum1>\\n<addentum2>\\n\"\n");
         return 1;
     }
 
