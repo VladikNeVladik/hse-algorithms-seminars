@@ -6,7 +6,8 @@ TIME_FORMAT="CPU Percentage: %P\nMemory: %t kB\nTime: %e sec\nReturn value: %x"
 
 # List of tests for current problem:
 TESTS = \
-	stack-overflow-gen
+	stack-overflow-gen \
+	overflow
 
 # Command arguments:
 # PROGRAM - program being tested
@@ -23,7 +24,7 @@ test: $(PROGRAM_BIN) $(TEST_OUTPUTS) FORCE
 tests/%.output: tests/%.input $(PROGRAM_BIN) FORCE
 	@mkdir -p tests
 	@printf "\033[1;33mRunning \033[1;36m$*\033[1;33m for solution \033[1;36m$(PROGRAM)\033[0m\n"
-	@$(TIME_CMD) --format=$(TIME_FORMAT) $(PROGRAM_BIN) < $< > $@
+	@$(TIME_CMD) --quiet --format=$(TIME_FORMAT) $(PROGRAM_BIN) < $< > $@ | cat
 	@printf "\033[1;35m"
 	@cat $@
 	@printf "\033[0m"
