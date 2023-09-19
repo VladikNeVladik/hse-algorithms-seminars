@@ -1,7 +1,7 @@
 # No copyright. Vladislav Aleinik, 2023
 
 # Compilation flags:
-CFLAGS=                          \
+CFLAGS=\
 	-O2                          \
 	-Wall                        \
 	-Werror                      \
