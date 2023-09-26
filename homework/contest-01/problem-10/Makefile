@@ -5,7 +5,8 @@
 #===============================#
 
 # List of tests for current problem:
-TESTS=# None
+TESTS=\
+	incorrect-input
 
 # Include common Makefile:
 include ../../common.mk

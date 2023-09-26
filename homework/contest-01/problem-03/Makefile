@@ -6,8 +6,7 @@
 
 # List of tests for current problem:
 TESTS = \
-	timing \
-	overshift
+	overflow
 
 # Include common Makefile:
 include ../../common.mk
