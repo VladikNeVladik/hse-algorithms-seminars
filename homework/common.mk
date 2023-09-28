@@ -1,7 +1,21 @@
 # No copyright. Vladislav Aleinik, 2023
 
+#========#
+# Colors #
+#========#
+
+BRED    = \033[1;31m
+BYELLOW = \033[1;33m
+GREEN   = \033[1;35m
+BCYAN   = \033[1;36m
+RESET   = \033[0m
+
+#=======================#
+# Hand-made test system #
+#=======================#
+
 # Compilation flags:
-CFLAGS=\
+CFLAGS = \
 	-O2                          \
 	-Wall                        \
 	-Werror                      \
@@ -26,36 +40,65 @@ CFLAGS=\
 	-lm
 
 # Timing command usage:
-TIME_CMD=/usr/bin/time
-TIME_FORMAT="CPU Percentage: %P\nMemory: %t kB\nTime: %e sec\nReturn value: %x"
+TIME_CMD    = /usr/bin/time
+TIME_FORMAT = \
+	"CPU Percentage: %P\nReal time: %e sec\nUser time: %U sec\nMemory: %t kB\nReturn value: %x"
+
+#===================#
+# Command arguments #
+#===================#
+
+default: test
 
 # Command arguments:
 # PROGRAM - program being tested
-PROGRAM_BIN=build/$(PROGRAM)
+# MAX_MEMORY - memory limit for heap
+ifndef MAX_MEMORY
+MAX_MEMORY=1000000 # 1MiB
+endif
+
+verify-input-program:
+	@if [ -z "$(PROGRAM)" ]; then \
+		printf "$(BRED)Error$(BYELLOW): define program as $(BCYAN)PROGRAM=program$(RESET)\n"; \
+		exit 1; \
+	fi
 
 #=======================#
 # Hand-made test system #
 #=======================#
 
-TEST_OUTPUTS = $(TESTS:%=build/%.output)
-TIME_OUTPUT = build/time.output
+PROGRAM_BIN=build/$(PROGRAM)
 
-test: $(PROGRAM_BIN) $(TEST_OUTPUTS) FORCE
+OUTPUTS_TIME   = $(TESTS:%=build/%.output.time)
+OUTPUTS_MEMORY = $(TESTS:%=build/%.output.memory)
 
-build/%.output: tests/%.input $(PROGRAM_BIN) FORCE
-	@mkdir -p tests
-	@printf "\033[1;33mRunning \033[1;36m$*\033[1;33m for solution \033[1;36m$(PROGRAM)\033[0m\n"
+test:   verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TIME)   FORCE
+memory: verify-input-program $(PROGRAM_BIN) $(OUTPUTS_MEMORY) FORCE
+
+build/%.output.time: tests/%.input $(PROGRAM_BIN) FORCE
+	@mkdir -p build
+	@printf "$(BYELLOW)Measure time on $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
 	@$(TIME_CMD) --quiet --format=$(TIME_FORMAT) $(PROGRAM_BIN) < $< > $@ | cat
-	@printf "\033[1;35m"
+	@printf "$(GREEN)"
 	@cat $@
-	@printf "\033[0m"
+	@printf "$(RESET)"
 
-time: $(PROGRAM_BIN) FORCE
-	@printf "\033[1;33mRunning program \033[1;36m$(PROGRAM)\033[0m\n"
-	@$(TIME_CMD) --quiet --format=$(TIME_FORMAT) $(PROGRAM_BIN) > ${TIME_OUTPUT} | cat
-	@printf "\033[1;35m"
-	@cat ${TIME_OUTPUT}
-	@printf "\033[0m"
+build/%.output.memory: tests/%.input $(PROGRAM_BIN) FORCE
+	@mkdir -p build
+	@printf "$(BYELLOW)Limit memory ($(BCYAN)$(MAX_MEMORY)$(BYELLOW))"\
+	" on $(BCYAN)$*$(BYELLOW) for \033[1;36m$(PROGRAM)$(RESET)\n"
+	@prlimit --data=$(MAX_MEMORY) $(PROGRAM_BIN) < $< > $@ | cat
+	@printf "$(GREEN)"
+	@cat $@
+	@printf "$(RESET)"
+
+time: verify-input-program $(PROGRAM_BIN) FORCE
+	@mkdir -p build
+	@printf "$(BYELLOW)Measure time for $(BCYAN)$(PROGRAM)$(RESET)\n"
+	@$(TIME_CMD) --quiet --format=$(TIME_FORMAT) $(PROGRAM_BIN) > build/$*.time | cat
+	@printf "$(GREEN)"
+	@cat build/$*.time
+	@printf "$(RESET)"
 
 #==============#
 # Build system #
@@ -63,11 +106,19 @@ time: $(PROGRAM_BIN) FORCE
 
 build/%: %.c
 	@mkdir -p build
-	@printf "\033[1;33mBuilding solution \033[1;36m$*\033[0m\n"
+	@printf "$(BYELLOW)Building solution \033[1;36m$*$(RESET)\n"
 	@gcc $< $(CFLAGS) -o $@
 
 clean: FORCE
 	@rm -rf build
 	@rm -f tests/*-gen.input
+
+#================================#
+# Contest manipulation utilities #
+#================================#
+
+clean-all: FORCE
+	@rm -rf ../../contest-*/problem-*/build
+	@rm  -f ../../contest-*/problem-*/tests/*-gen.input
 
 .PHONY: test clean FORCE
