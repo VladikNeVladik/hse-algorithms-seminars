@@ -1,21 +1,15 @@
 # No copyright. Vladislav Aleinik, 2023
 
-#========#
-# Colors #
-#========#
+#=====================#
+# Compilation process #
+#=====================#
 
-BRED    = \033[1;31m
-BYELLOW = \033[1;33m
-GREEN   = \033[1;35m
-BCYAN   = \033[1;36m
-RESET   = \033[0m
-
-#=======================#
-# Hand-made test system #
-#=======================#
+ifndef CC
+CC=gcc
+endif
 
 # Compilation flags:
-CFLAGS = \
+CFLAGS += \
 	-O2                          \
 	-Wall                        \
 	-Werror                      \
@@ -39,6 +33,20 @@ CFLAGS = \
 	-std=gnu99                   \
 	-lm
 
+#========#
+# Colors #
+#========#
+
+BRED    = \033[1;31m
+BYELLOW = \033[1;33m
+GREEN   = \033[1;35m
+BCYAN   = \033[1;36m
+RESET   = \033[0m
+
+#=======================#
+# Hand-made test system #
+#=======================#
+
 # Timing command usage:
 TIME_CMD    = /usr/bin/time
 TIME_FORMAT = \
@@ -54,7 +62,7 @@ default: test
 # PROGRAM - program being tested
 # MAX_MEMORY - memory limit for heap
 ifndef MAX_MEMORY
-MAX_MEMORY=1000000 # 1MiB
+MAX_MEMORY=64000000# 64MiB
 endif
 
 verify-input-program:
@@ -107,7 +115,7 @@ time: verify-input-program $(PROGRAM_BIN) FORCE
 build/%: %.c
 	@mkdir -p build
 	@printf "$(BYELLOW)Building solution \033[1;36m$*$(RESET)\n"
-	@gcc $< $(CFLAGS) -o $@
+	@$(CC) $< $(CFLAGS) -o $@
 
 clean: FORCE
 	@rm -rf build
