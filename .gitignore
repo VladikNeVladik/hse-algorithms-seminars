@@ -3,14 +3,16 @@
 
 # Build files:
 build/
-tests/*.output
+
+# Course testworks:
+homework/control-*/
 
 # Student homeworks:
 homework/contest-*/problem-*/*.c
 
-# Special tests:
-homework/contest-*/problem-*/tests/*.output
+# Generated test inputs/outputs:
 homework/contest-*/problem-*/tests/*-gen.input
+homework/contest-*/problem-*/tests/*-gen.output
 
 # CTags printout:
 .tags

@@ -38,6 +38,7 @@ CFLAGS += \
 #========#
 
 BRED    = \033[1;31m
+BGREEN  = \033[1;32m
 BYELLOW = \033[1;33m
 GREEN   = \033[1;35m
 BCYAN   = \033[1;36m
@@ -56,7 +57,9 @@ TIME_FORMAT = \
 # Command arguments #
 #===================#
 
-default: test
+PROGRAM_BIN=build/$(PROGRAM)
+
+default: verify-input-program $(PROGRAM_BIN)
 
 # Command arguments:
 # PROGRAM - program being tested
@@ -75,44 +78,61 @@ verify-input-program:
 # Hand-made test system #
 #=======================#
 
-PROGRAM_BIN=build/$(PROGRAM)
+# Test verdicts:
+VERDICT_INAPT = "$(BYELLOW)[INAPT]$(RESET)\n"
+VERDICT_OK    = "$(BGREEN)[OK]$(RESET)\n"
+VERDICT_ERR   = "$(BRED)[ERR]$(RESET)\n"
 
+OUTPUTS_TEST   = $(TESTS:%=build/%.output.test)
 OUTPUTS_TIME   = $(TESTS:%=build/%.output.time)
 OUTPUTS_MEMORY = $(TESTS:%=build/%.output.memory)
 
-test:   verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TIME)   FORCE
+test:   verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TEST)   FORCE
+time:   verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TIME)   FORCE
 memory: verify-input-program $(PROGRAM_BIN) $(OUTPUTS_MEMORY) FORCE
+
+build/%.output.test: tests/%.input $(PROGRAM_BIN) FORCE
+	@mkdir -p build
+	@printf "$(BYELLOW)Run test $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
+	@$(PROGRAM_BIN) < $< > $@ | cat
+	@if [ ! -f tests/$*.output ]; then \
+		printf $(VERDICT_INAPT); \
+	elif cmp -s tests/$*.output $@; then \
+		printf $(VERDICT_OK); \
+	else \
+		printf $(VERDICT_ERR); \
+	fi
 
 build/%.output.time: tests/%.input $(PROGRAM_BIN) FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Measure time on $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
 	@$(TIME_CMD) --quiet --format=$(TIME_FORMAT) $(PROGRAM_BIN) < $< > $@ | cat
-	@printf "$(GREEN)"
-	@cat $@
-	@printf "$(RESET)"
+	@if [ ! -f tests/$*.output ]; then \
+		printf $(VERDICT_INAPT); \
+	elif cmp -s tests/$*.output $@; then \
+		printf $(VERDICT_OK); \
+	else \
+		printf $(VERDICT_ERR); \
+	fi
 
 build/%.output.memory: tests/%.input $(PROGRAM_BIN) FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Limit memory ($(BCYAN)$(MAX_MEMORY)$(BYELLOW))"\
 	" on $(BCYAN)$*$(BYELLOW) for \033[1;36m$(PROGRAM)$(RESET)\n"
 	@prlimit --data=$(MAX_MEMORY) $(PROGRAM_BIN) < $< > $@ | cat
-	@printf "$(GREEN)"
-	@cat $@
-	@printf "$(RESET)"
-
-time: verify-input-program $(PROGRAM_BIN) FORCE
-	@mkdir -p build
-	@printf "$(BYELLOW)Measure time for $(BCYAN)$(PROGRAM)$(RESET)\n"
-	@$(TIME_CMD) --quiet --format=$(TIME_FORMAT) $(PROGRAM_BIN) > build/$*.time | cat
-	@printf "$(GREEN)"
-	@cat build/$*.time
-	@printf "$(RESET)"
+	@if [ ! -f tests/$*.output ]; then \
+		printf $(VERDICT_INAPT); \
+	elif cmp -s tests/$*.output $@; then \
+		printf $(VERDICT_OK); \
+	else
+		printf $(VERDICT_ERR); \
+	fi
 
 #==============#
 # Build system #
 #==============#
 
-build/%: %.c
+build/%: %.c FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Building solution \033[1;36m$*$(RESET)\n"
 	@$(CC) $< $(CFLAGS) -o $@
