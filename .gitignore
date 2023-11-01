@@ -1,8 +1,9 @@
 # Object files:
 *.o
 
-# Build files:
+# Build and resourse files:
 build/
+res/
 
 # Course testworks:
 homework/control-*/
