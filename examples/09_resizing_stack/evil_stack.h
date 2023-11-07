@@ -40,7 +40,7 @@ void stack_init(struct Stack* stack)
     stack->array = malloc(1U * sizeof(data_t));
     VERIFY_CONTRACT(
         stack->array != NULL,
-        "[stack_init] Unable to allocate memory for stack of capacity %zu",
+        "[stack_init] Unable to allocate memory for stack of capacity %zu\n",
         stack->capacity);
 }
 
@@ -52,9 +52,6 @@ void stack_free(struct Stack* stack)
     free(stack->array);
 }
 
-//==================//
-// Stack operations //
-//==================//
 
 // Perform a resize operation.
 // NOTE: this function is for internal use only.
@@ -63,29 +60,24 @@ void stack_resize(struct Stack* stack, size_t new_capacity)
     assert(stack != NULL);
 
     // Allocate new array:
-    data_t* new_array = malloc(new_capacity * sizeof(data_t));
+    data_t* new_array = realloc(stack->array, new_capacity * sizeof(data_t));
     VERIFY_CONTRACT(
         new_array != NULL,
-        "[stack_push] Unable to allocate memory for stack of capacity %zu",
+        "[stack_resize] Unable to allocate memory for stack of capacity %zu\n",
         stack->capacity);
 
     // Calculate resulting stack size:
     size_t new_size = MIN(stack->size, new_capacity);
-
-    // Copy elements from old array into new array:
-    for (size_t i = 0; i < new_size; ++i)
-    {
-        new_array[i] = stack->array[i];
-    }
-
-    // Free old array:
-    free(stack->array);
 
     // Update stack data:
     stack->array    = new_array;
     stack->size     = new_size;
     stack->capacity = new_capacity;
 }
+
+//==================//
+// Stack operations //
+//==================//
 
 // Push an element on top of the stack.
 void stack_push(struct Stack* stack, data_t element)

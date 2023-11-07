@@ -12,10 +12,10 @@
 typedef uint64_t data_t;
 
 // Version of stack to be used:
-#include "evil_stack.h"
+#include "stack.h"
 
-#define BENCHMARK_STEP       10000U
-#define BENCHMARK_NUM_PUSHS 100000U
+#define BENCHMARK_STEP       10000000U
+#define BENCHMARK_NUM_PUSHS 100000000U
 
 int main(void)
 {
