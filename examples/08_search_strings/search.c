@@ -125,6 +125,12 @@ int main(void)
     // Place a null-terminator:
     haystack[haystack_len] = '\0';
 
+    // Close file:
+    ret = fclose(haystack_file);
+    VERIFY_CONTRACT(ret == 0,
+        "Unable to close file \'%s\'\n",
+        HAYSTACK_FILENAME);
+
     //-----------------------//
     // Prepare needle string //
     //-----------------------//
