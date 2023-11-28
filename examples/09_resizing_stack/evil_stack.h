@@ -1,3 +1,4 @@
+// No copyright. Vladislav Aleinik, 2023
 #ifndef HEADER_GUARD_EVIL_STACK_H_INCLUDED
 #define HEADER_GUARD_EVIL_STACK_H_INCLUDED
 

@@ -26,17 +26,25 @@ CFLAGS=\
 	-lm
 
 INCLUDES=\
-	matrix.h \
-	vector.h \
+	list.h \
+	polynomial.h \
 	utils.h
 
-build/test: test.c $(INCLUDES)
+build/read: read.c $(INCLUDES)
 	@mkdir -p build
-	gcc test.c ${CFLAGS} -o build/test
+	gcc read.c ${CFLAGS} -o build/read
 
-run: build/test
+build/write: write.c $(INCLUDES)
+	@mkdir -p build
+	gcc write.c ${CFLAGS} -o build/write
+
+read: build/read
 	@mkdir -p res
-	@./build/test
+	@./build/read
+
+write: build/write
+	@mkdir -p res
+	@./build/write
 
 clean:
 	@rm -rf res
