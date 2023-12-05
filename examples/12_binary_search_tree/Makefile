@@ -26,28 +26,19 @@ CFLAGS=\
 	-lm
 
 INCLUDES=\
-	list.h \
-	polynomial.h \
+	tree.h \
 	utils.h
 
-build/read: read.c $(INCLUDES)
+build/test: test.c $(INCLUDES)
 	@mkdir -p build
-	gcc read.c ${CFLAGS} -o build/read
+	gcc test.c ${CFLAGS} -o build/test
 
-build/write: write.c $(INCLUDES)
-	@mkdir -p build
-	gcc write.c ${CFLAGS} -o build/write
-
-read: build/read
+run: build/test
 	@mkdir -p res
-	@./build/read
-
-write: build/write
-	@mkdir -p res
-	@./build/write
+	@./build/test
 
 clean:
 	@rm -rf res
 	@rm -rf build
 
-.PHONY: read write clean
+.PHONY: run clean
