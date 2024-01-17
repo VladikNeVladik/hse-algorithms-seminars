@@ -124,7 +124,7 @@ build/%.output.memory: tests/%.input $(PROGRAM_BIN) FORCE
 		printf $(VERDICT_INAPT); \
 	elif cmp -s tests/$*.output $@; then \
 		printf $(VERDICT_OK); \
-	else
+	else \
 		printf $(VERDICT_ERR); \
 	fi
 
