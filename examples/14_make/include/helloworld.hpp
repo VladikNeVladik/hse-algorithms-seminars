@@ -1,0 +1,6 @@
+#ifndef HELLOWORLD_HPP_INCLUDED
+#define HELLOWORLD_HPP_INCLUDED
+
+void print_helloworld();
+
+#endif // HELLOWORLD_HPP_INCLUDED
