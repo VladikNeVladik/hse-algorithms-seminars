@@ -1,18 +1,5 @@
 # No copyright. Vladislav Alenik, 2024
 
-# How to use this Makefile:
-# 1. Place all you .cpp files into the src folder.
-#    List them in the SOURCES file.
-# 2. Place all you .hpp files into the include folder.
-#    List them in the INCLUDES file.
-# 3. Set EXECUTABLE variable to your program's name.
-# 4. Build your program with "make".
-# 5. Perform debug build with "make DEBUG=1" or "DEBUG=1 make".
-# 6. Run your program with "make run".
-# 7. Clean all build files with "make clean".
-#
-# ENJOY!
-
 #-----------------------
 # Compiler/linker flags
 #-----------------------
@@ -58,19 +45,23 @@ RESET   = \033[0m
 #-------
 
 INCLUDES = \
-	include/helloworld.hpp
+	include/utils.hpp \
+	include/vector.hpp \
+	include/matrix.hpp
 
 # Add "include" folder to header search path:
 CFLAGS += -I $(abspath include)
 
 # List of sources:
 SOURCES = \
-	hello.cpp \
-	world.cpp
+	test.cpp \
+	utils.cpp \
+	vector.cpp \
+	matrix.cpp
 
 OBJECTS = $(SOURCES:%.cpp=build/%.o)
 
-EXECUTABLE = build/helloworld
+EXECUTABLE = build/test
 
 #---------------
 # Build process
@@ -99,6 +90,7 @@ build/%.o: src/%.cpp $(INCLUDES)
 
 # Run program:
 run: $(EXECUTABLE)
+	@mkdir -p res
 	./$(EXECUTABLE)
 
 #---------------
@@ -106,7 +98,8 @@ run: $(EXECUTABLE)
 #---------------
 
 clean:
-	@printf "$(BYELLOW)Cleaning build directory $(RESET)\n"
+	@printf "$(BYELLOW)Cleaning build and resource directories$(RESET)\n"
+	rm -rf res
 	rm -rf build
 
 # List of non-file targets:
