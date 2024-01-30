@@ -14,6 +14,8 @@ homework/contest-*/problem-*/*.c
 # Generated test inputs/outputs:
 homework/contest-*/problem-*/tests/*-gen.input
 homework/contest-*/problem-*/tests/*-gen.output
+examples/*/tests/*-gen.input
+examples/*/tests/*-gen.output
 
 # CTags printout:
 .tags
