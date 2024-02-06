@@ -136,7 +136,10 @@ Vector& Vector::operator=(Vector&& vector)
 // NOTE: the rule of five (5/5)
 Vector::~Vector()
 {
-    delete[] data_;
+    if (data_ != nullptr)
+    {
+        delete[] data_;
+    }
 
     // Set vector data to NULL to detect double free:
     data_ = nullptr;
