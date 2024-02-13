@@ -14,26 +14,6 @@ constexpr size_t SIZE = 100U;
 template <typename Data_t>
 void fill_vector(VectorArithmetics::Vector<Data_t>& vector)
 {
-    static_assert("Found no general implementation of template fill_vector!");
-
-    // Get rid of "unused variable warning":
-    (void) vector;
-}
-
-// Template instantiation:
-// NOTE: how to use one implementation for several types?
-template <>
-void fill_vector(VectorArithmetics::Vector<double>& vector)
-{
-    for (size_t i = 0U; i < SIZE; ++i)
-    {
-        vector[i] = i;
-    }
-}
-
-template <>
-void fill_vector(VectorArithmetics::Vector<int>& vector)
-{
     for (size_t i = 0U; i < SIZE; ++i)
     {
         vector[i] = i;

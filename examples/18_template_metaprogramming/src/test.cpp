@@ -144,7 +144,11 @@ bool test_multiplication()
     }
 
     // Add two vectors together:
-    vec1 = vec1 * 2;
+    // NOTE: some wierdness for std::string
+    Data_t coeff{};
+    coeff = 2U;
+
+    vec1 = vec1 * coeff;
 
     return (vec1 != vec2)? FAIL : OK;
 }
@@ -177,13 +181,15 @@ int main(void)
     printf("\n");
 
     // Wierd and incorrect template instantiations:
-    // printf("Testing Vector<std::string>:\n");
-    // run_test("string-constructor",      test_constructor<std::string>);
-    // run_test("string-copy-constructor", test_copy_constructor<std::string>);
-    // run_test("string-move-constructor", test_move_constructor<std::string>);
-    // run_test("string-copy-assignment",  test_copy_assignment<std::string>);
-    // run_test("string-move-assignment",  test_move_assignment<std::string>);
-    // run_test("string-addition",         test_addition<std::string>);
+    printf("Testing Vector<std::string>:\n");
+    run_test("string-constructor",      test_constructor<std::string>);
+    run_test("string-copy-constructor", test_copy_constructor<std::string>);
+    run_test("string-move-constructor", test_move_constructor<std::string>);
+    run_test("string-copy-assignment",  test_copy_assignment<std::string>);
+    run_test("string-move-assignment",  test_move_assignment<std::string>);
+    run_test("string-addition",         test_addition<std::string>);
+
+    // NOTE: uncomment to get a reasonable error message!
     // run_test("string-multiplication",   test_multiplication<std::string>);
 
     return EXIT_SUCCESS;

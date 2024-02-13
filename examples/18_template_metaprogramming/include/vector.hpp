@@ -12,11 +12,11 @@
 #include <algorithm>
 
 #include <utils.hpp>
+#include <metaprogramming.hpp>
 
 namespace VectorArithmetics
 {
     // Structure to represent the vector in N-dimensional space:
-    // NOTE: this is a more specialized case for template deduction.
     template <typename Data_t>
     class Vector
     {
@@ -113,8 +113,8 @@ namespace VectorArithmetics
     {
         static_assert(std::is_default_constructible<Data_t>::value,
                       "Vector copy constructor requires a default constructible type!");
-        static_assert(std::is_trivially_copyable<Data_t>::value,
-                      "Vector copy constructor requires a trivially copyable type!");
+        static_assert(std::is_copy_assignable<Data_t>::value,
+                      "Vector::setSize() requires a copy assignable type!");
 
         VERIFY_CONTRACT(vector.ok(),
             "Unable to create Vector from invalid origin");
@@ -123,7 +123,10 @@ namespace VectorArithmetics
         data_ = new Data_t[vector.size_];
         size_ = vector.size_;
 
-        std::copy_n(vector.data_, size_, data_);
+        for (size_t i = 0U; i < size_; ++i)
+        {
+            data_[i] = vector.data_[i];
+        }
 
         // NOTE: be paranoid, ensure the invariant is established.
         VERIFY_CONTRACT(this->ok(),
@@ -159,8 +162,8 @@ namespace VectorArithmetics
     {
         static_assert(std::is_default_constructible<Data_t>::value,
                       "Vector copy assignment requires a default constructible type!");
-        static_assert(std::is_trivially_copyable<Data_t>::value,
-                      "Vector copy assignment requires a trivially copyable type!");
+        static_assert(std::is_copy_assignable<Data_t>::value,
+                      "Vector::setSize() requires a copy assignable type!");
 
         VERIFY_CONTRACT(this->ok(),
             "Left operand of copy assignment is invalid");
@@ -180,7 +183,10 @@ namespace VectorArithmetics
         data_ = new Data_t[vector.size_];
         size_ = vector.size_;
 
-        std::copy_n(vector.data_, size_, data_);
+        for (size_t i = 0U; i < size_; ++i)
+        {
+            data_[i] = vector.data_[i];
+        }
 
         // NOTE: be paranoid, ensure the invariant still holds.
         VERIFY_CONTRACT(this->ok(),
@@ -258,8 +264,8 @@ namespace VectorArithmetics
     {
         static_assert(std::is_default_constructible<Data_t>::value,
                       "Vector::setSize() requires a default constructible type!");
-        static_assert(std::is_trivially_copyable<Data_t>::value,
-                      "Vector::setSize() requires a trivially copyable type!");
+        static_assert(std::is_copy_assignable<Data_t>::value,
+                      "Vector::setSize() requires a copy assignable type!");
         static_assert(std::is_destructible<Data_t>::value,
                       "Vector::setSize() requires a destructible type!");
 
@@ -274,7 +280,10 @@ namespace VectorArithmetics
         // NOTE: new throws exception std::bad_alloc on allocation error.
         Data_t* new_data = new Data_t[new_size];
 
-        std::copy_n(new_data, std::min(new_size, size_), data_);
+        for (size_t i = 0U; i < std::min(new_size, size_); ++i)
+        {
+            new_data[i] = data_[i];
+        }
 
         // Unallocate old allocated data:
         delete[] data_;
@@ -328,6 +337,9 @@ namespace VectorArithmetics
     template <typename Data_t>
     Vector<Data_t>& Vector<Data_t>::operator+=(const Vector<Data_t>& other)
     {
+        static_assert(Meta::is_addition_assignable<Data_t>::value,
+            "Vector::operator+= requires an addition-assignable parameter type!");
+
         VERIFY_CONTRACT(this->ok(),
             "Invalid vector data (possible double free for left argument)");
         VERIFY_CONTRACT(other.ok(),
@@ -360,6 +372,9 @@ namespace VectorArithmetics
     template <typename Data_t>
     Vector<Data_t>& Vector<Data_t>::operator*=(const Data_t& koeff)
     {
+        static_assert(Meta::is_multiplication_assignable<Data_t>::value,
+            "Vector::operator*= requires a multiplication-assignable parameter type!");
+
         VERIFY_CONTRACT(this->ok(),
             "Invalid vector data (possible double free for left argument)");
 
@@ -378,6 +393,9 @@ namespace VectorArithmetics
     template <typename Data_t>
     bool Vector<Data_t>::operator==(const Vector<Data_t>& other) const
     {
+        static_assert(Meta::is_comparable<Data_t>::value,
+            "Vector::operator== requires a comparable parameter type!");
+
         VERIFY_CONTRACT(this->ok(),
             "Invalid vector data (possible double free for left argument)");
         VERIFY_CONTRACT(other.ok(),
