@@ -126,8 +126,6 @@ bool test_addition()
 
 int main(void)
 {
-    test_constructor();
-
     run_test("constructor",      test_constructor);
     run_test("copy-constructor", test_copy_constructor);
     run_test("move-constructor", test_move_constructor);

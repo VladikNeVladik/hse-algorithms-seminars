@@ -56,7 +56,6 @@ CFLAGS += -I $(abspath include)
 SOURCES = \
 	utils.cpp \
 	test_system.cpp \
-	vector.cpp \
 	test.cpp
 
 OBJECTS = $(SOURCES:%.cpp=build/%.o)
