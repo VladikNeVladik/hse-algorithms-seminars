@@ -26,10 +26,14 @@ using namespace TestSystem;
 // Test verdicts
 //---------------
 
-constexpr size_t TIMEOUT_MILLISSECONDS = 100U; // seconds
+constexpr size_t TIMEOUT_STEP_MS = 100U;
 
 // Test system implementation:
-TestResult TestSystem::run_test(const char* name, TestScenario test, bool inspect /* = false */)
+TestResult TestSystem::run_test(
+    const char* name,
+    TestScenario test,
+    size_t timeout_ms /* = 1000U */,
+    bool inspect /* = false */)
 {
     // Print the test name:
     printf("Running test %20s: ", name);
@@ -77,7 +81,7 @@ TestResult TestSystem::run_test(const char* name, TestScenario test, bool inspec
 
     pid_t ret = 0;
     int wstatus = 0;
-    for (size_t msec = 0U; msec < TIMEOUT_MILLISSECONDS; ++msec)
+    for (size_t msec = 0U; msec < timeout_ms; msec += TIMEOUT_STEP_MS)
     {
         // Wait for child process to return:
         ret = waitpid(child_pid, &wstatus, WNOHANG);
@@ -100,6 +104,7 @@ TestResult TestSystem::run_test(const char* name, TestScenario test, bool inspec
     // Handle timeout exit:
     if (ret == 0)
     {
+        kill(child_pid, SIGTERM);
         printf(BPURPLE "[TIMEOUT]\n" RESET);
         return TIMEOUT;
     }
