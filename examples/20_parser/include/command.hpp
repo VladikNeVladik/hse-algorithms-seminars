@@ -96,15 +96,18 @@ public:
 
     // Ensure command is never copied:
     Command(const Command&) = delete;
-    Command(Command&&) = default;
+    Command(Command&&);
 
     Command& operator=(const Command&) = delete;
-    Command& operator=(Command&&) = default;
+    Command& operator=(Command&&);
 
     // Command execution:
     void execute() const;
 
 private:
+    // Memory management utility:
+    void release();
+
     CommandType type_;
 
     void* ptr_;

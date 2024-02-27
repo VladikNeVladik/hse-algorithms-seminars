@@ -36,14 +36,7 @@ public:
     Parser& operator=(const Parser&) = delete;
     Parser& operator=(Parser&&) = default;
 
-    bool parse_space_sequence();
-    bool parse_newline_sequence();
-    bool parse_end_of_file();
-
-    Cmd_t parse_command_name();
-    Reg_t parse_register_name();
-    Val_t parse_integral_value();
-    Command parse_command_line();
+    // Parsing utilites:
     std::vector<Command> parse_command_sequence();
 
 private:
@@ -53,6 +46,16 @@ private:
     // Regular expression usage:
     bool parse_pattern(std::regex regexp);
     bool parse_pattern(std::regex regexp, std::string& ret);
+
+    // Parsing utilites:
+    bool parse_space_sequence();
+    bool parse_newline_sequence();
+    bool parse_end_of_file();
+
+    Cmd_t parse_command_name();
+    Reg_t parse_register_name();
+    Val_t parse_integral_value();
+    Command parse_command_line();
 
     // Parser state:
     std::ifstream file_;
