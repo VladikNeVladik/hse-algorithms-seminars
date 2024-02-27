@@ -157,38 +157,38 @@ Command::~Command()
     {
         case CommandType::BEGIN:
         {
-            CommandBegin* ptr = static_cast<CommandBegin*>(ptr_);
-            delete ptr;
+            // CommandBegin* ptr = static_cast<CommandBegin*>(ptr_);
+            // delete ptr;
             break;
         }
         case CommandType::END:
         {
-            CommandEnd* ptr = static_cast<CommandEnd*>(ptr_);
-            delete ptr;
+            // CommandEnd* ptr = static_cast<CommandEnd*>(ptr_);
+            // delete ptr;
             break;
         }
         case CommandType::PUSH:
         {
-            CommandPush* ptr = static_cast<CommandPush*>(ptr_);
-            delete ptr;
+            // CommandPush* ptr = static_cast<CommandPush*>(ptr_);
+            // delete ptr;
             break;
         }
         case CommandType::POP:
         {
-            CommandPop* ptr = static_cast<CommandPop*>(ptr_);
-            delete ptr;
+            // CommandPop* ptr = static_cast<CommandPop*>(ptr_);
+            // delete ptr;
             break;
         }
         case CommandType::PUSHR:
         {
-            CommandPushr* ptr = static_cast<CommandPushr*>(ptr_);
-            delete ptr;
+            // CommandPushr* ptr = static_cast<CommandPushr*>(ptr_);
+            // delete ptr;
             break;
         }
         case CommandType::POPR:
         {
-            CommandPopr* ptr = static_cast<CommandPopr*>(ptr_);
-            delete ptr;
+            // CommandPopr* ptr = static_cast<CommandPopr*>(ptr_);
+            // delete ptr;
             break;
         }
         default:
