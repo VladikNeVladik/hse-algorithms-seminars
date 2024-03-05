@@ -35,7 +35,8 @@ endif
 
 INCLUDES = \
 	include/utils.hpp \
-	include/renderer.hpp
+	include/renderer.hpp \
+	include/objects.hpp
 
 # Add "include" folder to header search path:
 CFLAGS += -I $(abspath include)
@@ -44,6 +45,7 @@ CFLAGS += -I $(abspath include)
 SOURCES = \
 	utils.cpp \
 	renderer.cpp \
+	objects.cpp \
 	game.cpp
 
 OBJECTS = $(SOURCES:%.cpp=build/%.o)
@@ -94,7 +96,8 @@ OS=$(shell uname)
 
 verify-build-os:
 	@if [ "$(OS)" != "Linux" ]; then \
-		printf "$(BRED)Error$(BYELLOW): selected program is Linux-specific$(RESET)\n"; \
+		printf "$(BRED)Error$(BYELLOW): selected program required XLib$(RESET)\n"; \
+		printf "$(BRED)Error$(BYELLOW): it may not be present on Mac OS or Windows" \
 		exit 1; \
 	fi
 

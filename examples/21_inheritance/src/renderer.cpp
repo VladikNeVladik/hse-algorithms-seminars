@@ -114,11 +114,11 @@ Renderer& Renderer::draw_rect(int x, int y, unsigned int sz_x, unsigned int sz_y
     return *this;
 }
 
-Renderer& Renderer::draw_circle(int x, int y, unsigned int r)
+Renderer& Renderer::draw_circle(int x, int y, unsigned int d)
 {
     // Use back buffer for rendering:
     XSetForeground(display_, gc_, 0x00FF00);
-    XFillArc(display_, back_buffer_, gc_, x, y, 2*r, 2*r, 0*64, 360*64);
+    XFillArc(display_, back_buffer_, gc_, x, y, d, d, 0*64, 360*64);
 
     return *this;
 }
