@@ -49,77 +49,77 @@ IO_ATTR void io_newline(void);
 IO_ATTR
 int io_get_dec(void)
 {
-	int r;
-	scanf("%d", &r);
-	return r;
+    int r;
+    scanf("%d", &r);
+    return r;
 }
 
 IO_ATTR
 unsigned io_get_udec(void)
 {
-	unsigned r;
-	scanf("%u", &r);
-	return r;
+    unsigned r;
+    scanf("%u", &r);
+    return r;
 }
 
 IO_ATTR
 unsigned io_get_hex(void)
 {
-	unsigned r;
-	scanf("%x", &r);
-	return r;
+    unsigned r;
+    scanf("%X", &r);
+    return r;
 }
 
 IO_ATTR
 int io_get_char(void)
 {
-	return getchar();
+    return getchar();
 }
 
 IO_ATTR
 void io_get_string(char *buf, int size)
 {
-	fgets(buf, size, stdin);
+    fgets(buf, size, stdin);
 }
 
 IO_ATTR
 void io_print_dec(int v)
 {
-	printf("%d", v);
+    printf("%d", v);
 }
 
 IO_ATTR
 void io_print_udec(unsigned v)
 {
-	printf("%u", v);
+    printf("%u", v);
 }
 
 IO_ATTR
 void io_print_hex(unsigned v)
 {
-	printf("%x", v);
+    printf("%X", v);
 }
 
 IO_ATTR
 void io_print_char(char c)
 {
-	putchar(c);
+    putchar(c);
 }
 
 IO_ATTR
 void io_print_string(const char *s)
 {
-	fputs(s, stdout);
+    fputs(s, stdout);
 }
 
 IO_ATTR
 void io_newline(void)
 {
-	putchar('\n');
+    putchar('\n');
 }
 
 __attribute__((constructor))
 static void unbuffer_stdout(void)
 {
-	setbuf(stdout, 0);
+    setbuf(stdout, 0);
 }
