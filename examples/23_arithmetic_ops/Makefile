@@ -32,13 +32,14 @@ LDFLAGS = \
 #-------
 
 SOURCES = \
+	src/benchmark.c \
 	src/macro.c \
 	src/main.asm
 
 OBJECTS_HALFWAY_DONE = $(SOURCES:src/%.c=build/%.o)
 OBJECTS              = $(OBJECTS_HALFWAY_DONE:src/%.asm=build/%.o)
 
-EXECUTABLE = build/helloworld
+EXECUTABLE = build/arithmetic_ops
 
 #---------------
 # Build scripts
@@ -65,7 +66,7 @@ clean:
 #---------------------
 
 install-deps:
-	@printf "Execute \"sudo apt install gcc-multilib build-essential gcc-i386-linux-gnueabi nasm qemu-system gdb\""
+	@printf "Execute \"sudo aptinstall build-essential gcc-i386-linux-gnueabi nasm qemu-system gdb\""
 	@printf "Or it's equivalent for your system"
 
 #----------------------
