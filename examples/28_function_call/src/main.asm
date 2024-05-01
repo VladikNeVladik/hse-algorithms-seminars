@@ -5,8 +5,7 @@ extern io_print_hex, io_print_char, io_print_string, io_newline
 ; Constants:                     SIMPLE  TRANSPOSED
 MATRIX_SIZE     equ    16
 ; MATRIX_SIZE     equ    1024 ;  3,04s   0,85s
-; MATRIX_SIZE     equ    2048 ;  3,04s   61,06s
-
+; MATRIX_SIZE     equ    2048 ;  65,04s  5,59s
 
 ; Friendly reminder - stack frame structure (from System V ABI for i386):
 ; [ebp + 16]            ...
@@ -33,6 +32,8 @@ matrix_init:
     mov     ebp, esp
     ; Save used callee-preserved registers:
     push    ebx
+    push    esi
+    push    edi
     ; Do not allocate any automatic variables.
     ; Ignore stack alignment as no library function calls are made.
 
@@ -76,6 +77,8 @@ matrix_init:
 .matrix_init_out_loop_exit:
 
     ; Restore used callee-preserved registers:
+    pop     esi
+    pop     edi
     pop     ebx
 
     ; Restore stack frame:
@@ -591,5 +594,3 @@ main:
     ; Return:
     xor     eax, eax
     ret
-
-section .bss
