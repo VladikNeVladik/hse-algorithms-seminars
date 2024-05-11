@@ -4,6 +4,7 @@
 
 CC  = x86_64-linux-gnu-gcc
 AS  = nasm
+AR  = ar
 GDB = gdb
 
 #=======================#
@@ -13,7 +14,8 @@ GDB = gdb
 CFLAGS = \
 	-m32 \
 	-Wfatal-errors \
-	-no-pie \
+	-std=gnu99 \
+	-fno-pie \
 	-g
 
 ASFLAGS = \
@@ -23,7 +25,7 @@ ASFLAGS = \
 
 LDFLAGS = \
 	-m32 \
-	-no-pie \
+	-fno-pie \
 	-z noexecstack \
 	-g
 
@@ -72,12 +74,21 @@ verify-input-program:
 # Files #
 #=======#
 
-SOURCES = \
-	../../macro.c \
+LIBMAIN_SOURCES = \
+	../../macro-control.c \
+	main.asm
+
+LIBMAIN_OBJECTS = \
+	build/macro-control.o \
+	build/main.o
+
+LIBMAIN = \
+	build/libmain.a
+
+EXEC_SOURCES = \
 	$(PROGRAM).asm
 
-OBJECTS = \
-	build/macro.o \
+EXEC_OBJECTS = \
 	build/$(PROGRAM).o
 
 #=======================#
@@ -138,16 +149,19 @@ build/%.output.memory: tests/%.input $(PROGRAM_BIN) FORCE
 # Build scripts
 #---------------
 
-$(PROGRAM_BIN): $(OBJECTS) Makefile
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@
-
-build/macro.o: ../../macro.c
+build/macro-control.o: ../../macro-control.c
 	@mkdir -p build
 	$(CC) $(CFLAGS) -c $< -o $@
 
 build/%.o: %.asm
 	@mkdir -p build
 	$(AS) $(ASFLAGS) $< -o $@
+
+$(LIBMAIN): $(LIBMAIN_OBJECTS)
+	ar r $@ $^
+
+$(PROGRAM_BIN): $(EXEC_OBJECTS) $(LIBMAIN) Makefile
+	$(CC) $(LDFLAGS) $(EXEC_OBJECTS) $(LIBMAIN) -o $@
 
 clean:
 	rm -rf build
