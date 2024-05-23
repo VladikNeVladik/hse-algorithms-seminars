@@ -96,7 +96,7 @@ void show_fe_environment(void)
 void handler_division_by_zero(int signum)
 {
     printf(RED"[FPU EXCEPTION] Division by zero\n"RESET);
-    exit(EXIT_FAILURE);
+    exit(EXIT_SUCCESS);
 }
 
 void enable_division_by_zero_check()
@@ -171,6 +171,8 @@ void disable_division_by_zero_check()
 
 int main(void)
 {
+    printf("\n");
+
     //===============================//
     // Print FP value/representation //
     //===============================//
@@ -216,8 +218,11 @@ int main(void)
     // Showcase NaN and infinity checks //
     //==================================//
 
+    printf("Not a number:       %f\n", not_a_number());
     printf("Not a number check: %s\n", is_nan(not_a_number()) ? "OK" : "FAILED");
     printf("Infinity check:     %s\n", is_infinity(1.0/0.0)   ? "OK" : "FAILED");
+
+    printf("\n");
 
     //=========================//
     // Show error accumulation //
@@ -227,7 +232,7 @@ int main(void)
     {
         float base = POW_BASE + step * POW_STEP;
 
-        printf("Sum of power series for base %f\n", base);
+        printf("Sum of power series for base: %f\n", base);
 
         float powers[SAMPLE_SIZE] = {};
         for (size_t i = 0U; i < SAMPLE_SIZE; ++i)
@@ -241,7 +246,7 @@ int main(void)
             sum += powers[i];
         }
 
-        printf("    Min-to-max summation: %f\n", sum);
+        printf("    Min-to-max summation:     %f\n", sum);
 
         sum = 0.0;
         for (int i = SAMPLE_SIZE - 1; i >= 0; --i)
@@ -249,10 +254,10 @@ int main(void)
             sum += powers[i];
         }
 
-        printf("    Max-to-min summation: %f\n", sum);
+        printf("    Max-to-min summation:     %f\n", sum);
 
         sum = (powf(base, SAMPLE_SIZE) - 1.0) / (base - 1.0);
-        printf("    Analythical result:   %f\n", sum);
+        printf("    Analytical result:        %f\n", sum);
 
         printf("\n");
     }
