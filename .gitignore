@@ -10,6 +10,7 @@ homework/control-*/
 
 # Student homeworks:
 homework/contest-*/problem-*/*.c
+homework/contest-*/problem-*/*.asm
 
 # Generated test inputs/outputs:
 homework/contest-*/problem-*/tests/*-gen.input

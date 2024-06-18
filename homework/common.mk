@@ -33,6 +33,21 @@ CFLAGS += \
 	-std=gnu99                   \
 	-lm
 
+ifndef NDEBUG
+CFLAGS += -g
+endif
+
+# The fun stuff:
+ifndef NOSAN
+CFLAGS += \
+	-fsanitize=address    \
+	-fsanitize=leak       \
+	-fsanitize=undefined  \
+	-fstack-protector-all \
+	-U_FORTIFY_SOURCE     \
+	-D_FORTIFY_SOURCE=0
+endif
+
 #========#
 # Colors #
 #========#
