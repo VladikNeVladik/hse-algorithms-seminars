@@ -1,4 +1,4 @@
-# No copyright. Vladislav Aleinik, 2024
+# Copyright 2024 Vladislav Aleinik
 
 # Include common Makefile:
 include ../../asm.mk

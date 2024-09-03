@@ -1,4 +1,4 @@
-# No copyright. Vladislav Aleinik, 2023
+# Copyright 2024 Vladislav Aleinik
 
 #=====================#
 # Compilation process #
