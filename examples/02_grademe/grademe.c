@@ -53,8 +53,21 @@ int main(void)
     // Compute total for home assignments:
     float hw1_sum = 0.0, hw2_sum = 0.0, hw3_sum = 0.0;
     float hw4_sum = 0.0, hw5_sum = 0.0, hw6_sum = 0.0;
+
+    // Compute number of tasks done in each homework:
+    int hw1_num_tasks = 0, hw2_num_tasks = 0, hw3_num_tasks = 0;
+    int hw4_num_tasks = 0, hw5_num_tasks = 0, hw6_num_tasks = 0;
     for (int i = 0; i < NUM_TASKS; ++i)
     {
+        // Determine whether task #i is done in every homework:
+        hw1_num_tasks += (hw1[i] > 0.01);
+        hw2_num_tasks += (hw2[i] > 0.01);
+        hw3_num_tasks += (hw3[i] > 0.01);
+        hw4_num_tasks += (hw4[i] > 0.01);
+        hw5_num_tasks += (hw5[i] > 0.01);
+        hw6_num_tasks += (hw6[i] > 0.01);
+
+        // Compute the sum for each HW:
         hw1_sum += hw1[i];
         hw2_sum += hw2[i];
         hw3_sum += hw3[i];
@@ -70,7 +83,15 @@ int main(void)
     hw5_sum = hw5_sum / NUM_TASKS - penalties[4];
     hw6_sum = hw6_sum / NUM_TASKS - penalties[5];
 
-    float hw_total = 0.05 * (hw1_sum + hw2_sum + hw3_sum + hw4_sum + hw5_sum + hw6_sum);
+    // Account for the fact that all HW total is zero if
+    // there is at least one HW with 2 or less tasks:
+    float hw_total = 0.0;
+    if (hw1_num_tasks >= 3 && hw2_num_tasks >= 3 && hw3_num_tasks >= 3 &&
+        hw4_num_tasks >= 3 && hw5_num_tasks >= 3 && hw6_num_tasks >= 3)
+    {
+        hw_total = 0.05 * (hw1_sum + hw2_sum + hw3_sum +
+                           hw4_sum + hw5_sum + hw6_sum);
+    }
 
     // Compute total for test assignments:
     float test_total = 0.01 * (papertest1 + papertest2)
@@ -92,7 +113,7 @@ int main(void)
 
     float result = roundf(10.0 * sem_total);
 
-    printf("Your grade is: %.2f\n", result);
+    printf("Your grade is: %.02f\n", result);
 
     return 0;
 }
