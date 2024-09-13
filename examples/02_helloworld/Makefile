@@ -8,6 +8,9 @@ build/hello: hello.c
 run: build/hello
 	@./build/hello
 
+python:
+	@./hello.py
+
 clean:
 	@rm -rf build
 
