@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <stdio.h>
 #include <limits.h>
 
@@ -19,7 +20,7 @@ int main(void)
     int sum_ext = num1_ext + num2_ext;
     if (sum_ext < SHRT_MIN || sum_ext > SHRT_MAX)
     {
-        printf("adder: %hd+%hd is too big to be represented in short", num1, num2);
+        printf("adder: %hd+%hd is too big to be represented in short\n", num1, num2);
         return 1;
     }
 
@@ -29,6 +30,17 @@ int main(void)
 
     // Print result:
     printf("%hd\n", sum);
+
+    // Another approach to the problem of overflow - use compiler builtins:
+    short rslt;
+    bool error = __builtin_add_overflow(num1, num2, &rslt);
+    if (error)
+    {
+        printf("adder: %hd+%hd is too big to be represented in short\n", num1, num2);
+        return 1;
+    }
+
+    printf("%hd\n", rslt);
 
     return 0;
 }
