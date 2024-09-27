@@ -62,11 +62,8 @@ bool double_equal(double first, double second, double epsilon)
 // - Значение по указателю x0 перезаписывается, если возвращаемое значение равно ONE_ROOT или TWO_ROOTS.
 // - Значение по указателю x1 перезаписывается, если возвращаемое значение равное TWO_ROOTS.
 //==================================================================================================
-unsigned solve_square(double a, double b, double c, double* x0, double* x1)
+unsigned solve_square(double a, double b, double c)
 {
-    assert(x0 != NULL);
-    assert(x1 != NULL);
-
     // Проверяем степень уравнения
     if (double_equal(a, 0.0, EPSILON))
     { // Уравнение является линейным
@@ -85,7 +82,7 @@ unsigned solve_square(double a, double b, double c, double* x0, double* x1)
         }
 
         // Линейное уравнение имеет одно решение
-        *x0 = -c / b;
+        x0 = -c / b;
         return ONE_ROOT;
     }
 
@@ -100,15 +97,15 @@ unsigned solve_square(double a, double b, double c, double* x0, double* x1)
     }
     else if (double_equal(D, 0.0, EPSILON))
     { // У уравнения ровно один корень
-        *x0 = -b / 2.0 / a;
+        x0 = -b / 2.0 / a;
         return ONE_ROOT;
     }
     else
     { // У уравнения ровно два действительных решения
         double sqrtD = sqrt(D);
 
-        *x0 = (-b - sqrtD) / 2.0 / a;
-        *x1 = (-b + sqrtD) / 2.0 / a;
+        x0 = (-b - sqrtD) / 2.0 / a;
+        x1 = (-b + sqrtD) / 2.0 / a;
         return TWO_ROOTS;
     }
 }
@@ -116,7 +113,6 @@ unsigned solve_square(double a, double b, double c, double* x0, double* x1)
 int main(void)
 {
     double a = 0.0, b = 0.0, c = 0.0;
-
     printf("Enter square equation coefficients:\n");
 
     // Получаем коэффициенты квадратного уравнения от пользователя:
@@ -130,8 +126,7 @@ int main(void)
     scanf("%lf", &c);
 
     // Вычисляем корни и печатаем корни квадратного уравнения:
-    double x0, x1;
-    unsigned num_roots = solve_square(a, b, c, &x0, &x1);
+    unsigned num_roots = solve_square(a, b, c);
 
     switch (num_roots)
     {
