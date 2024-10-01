@@ -45,7 +45,8 @@ CFLAGS += \
 	-fsanitize=undefined  \
 	-fstack-protector-all \
 	-U_FORTIFY_SOURCE     \
-	-D_FORTIFY_SOURCE=0
+	-D_FORTIFY_SOURCE=0   \
+	-ftrivial-auto-var-init=pattern
 endif
 
 #========#
