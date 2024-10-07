@@ -1,3 +1,5 @@
+// Copyright 2024 Vladislav Aleinik
+
 #include <stdint.h>
 #include <stdio.h>
 #include <stdbool.h>
