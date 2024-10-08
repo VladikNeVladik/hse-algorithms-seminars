@@ -13,15 +13,17 @@ CFLAGS=\
 	-Wpointer-arith              \
 	-Wtype-limits                \
 	-Wempty-body                 \
+	-Wno-logical-op              \
 	-Wstrict-prototypes          \
+	-Wold-style-declaration      \
 	-Wold-style-definition       \
+	-Wmissing-parameter-type     \
 	-Wmissing-field-initializers \
 	-Wnested-externs             \
 	-Wno-pointer-sign            \
 	-Wno-unused-result           \
 	-std=gnu99                   \
-	-lm                          \
-	-fstack-usage
+	-lm
 
 # Different build scenarios:
 cycle: fibs.c
@@ -34,7 +36,7 @@ bad: fibs.c
 
 good: fibs.c
 	@mkdir -p build
-	@clang fibs.c ${CFLAGS} -DFIBS_GOOD_RECURSION -o build/fibs
+	@gcc fibs.c ${CFLAGS} -DFIBS_GOOD_RECURSION -o build/fibs
 
 # Run scenarios:
 run: build/fibs
