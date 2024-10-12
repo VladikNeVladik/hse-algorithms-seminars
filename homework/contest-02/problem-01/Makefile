@@ -9,6 +9,9 @@ TESTS = \
 	stack-overflow-gen \
 	end-sequence-gen
 
+# Include common Makefile:
+include ../../common.mk
+
 tests/stack-overflow-gen.input: FORCE
 	@mkdir -p tests
 	@seq 200000 400000 > $@
@@ -16,6 +19,3 @@ tests/stack-overflow-gen.input: FORCE
 tests/end-sequence-gen.input: FORCE
 	@mkdir -p tests
 	@seq 100 200 > $@
-
-# Include common Makefile:
-include ../../common.mk

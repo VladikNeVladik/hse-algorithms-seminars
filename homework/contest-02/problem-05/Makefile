@@ -8,9 +8,9 @@
 TESTS = \
 	stack-overflow-gen
 
+# Include common Makefile:
+include ../../common.mk
+
 tests/stack-overflow-gen.input: FORCE
 	@mkdir -p tests
 	@echo 100000 > $@
-
-# Include common Makefile:
-include ../../common.mk
