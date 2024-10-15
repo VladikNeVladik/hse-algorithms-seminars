@@ -43,7 +43,8 @@ const char* PASSWORD = "Now you see me!";
 bool password_is_ok(const char* check)
 {
     // Последовательно сравниваем символы обеих строк
-    for (const char* pswd = PASSWORD; *pswd != '\0' && *check != '\0'; pswd++, check++)
+    const char* pswd = PASSWORD;
+    for (; *pswd != '\0' && *check != '\0'; pswd++, check++)
     {
         if (*pswd != *check)
         {
@@ -52,44 +53,32 @@ bool password_is_ok(const char* check)
         }
     }
 
-    // В противном случае строки равны
-    return true;
+    // В противном случае строки равны при равенстве размеров
+    return *pswd == *check;
 }
 
 //=========================================================//
 // Опасная программа, некорректно производящая ввод строки //
 //=========================================================//
 
-void grant_access(void)
-{
-    printf("Password is OK\n");
-}
-
-void prohibit_access(void)
-{
-    printf("Password is WRONG\n");
-}
-
-#define MAX_ARRAY_SIZE 32U
-
 int main(void)
 {
     // Условие необходимости проверки пароля
     bool check_password = VERIFY_PASSWORD;
-    char input_password[MAX_ARRAY_SIZE];
+    char input_password[32U];
 
     // Считываем пароль от пользователя
     int ret = scanf("%s", input_password);
     VERIFY_CONTRACT(ret == 1, "ERROR: unable to input string\n");
 
-    // Проверяем пароль и выполняем соответсвующее действие
+    // Проверяем пароль и выполняем соответствующее действие
     if (!check_password || password_is_ok(input_password))
     {
-        grant_access();
+        printf("Password is OK\n");
     }
     else
     {
-        prohibit_access();
+        printf("Password is WRONG\n");
     }
 
     return EXIT_SUCCESS;

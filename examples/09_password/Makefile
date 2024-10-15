@@ -13,8 +13,10 @@ build/password: password.c
 run: build/password
 	@./build/password
 
+# Очень странно, но без команды Make эти две команды возвращают разный результат
 break: build/password
-	printf 01234567890123456789012345678901ABCDEFGHIJK\\x01 | ./build/password
+	printf 01234567890123456789012345678901_123456789ABCDE\\x00 | ./build/password
+	printf 01234567890123456789012345678901_123456789ABCDE\\x01 | ./build/password
 
 clean:
 	@rm -rf build
