@@ -51,7 +51,7 @@ int comp_lexicographic(const void* p1, const void* p2)
 }
 
 //=============================//
-// Line sorting implementation //
+// Реализация сортировки строк //
 //=============================//
 
 #define MAX_LINES 32
