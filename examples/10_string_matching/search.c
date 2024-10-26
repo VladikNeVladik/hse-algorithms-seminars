@@ -388,7 +388,7 @@ int main(void)
         double ticks_delta = ticks_end - ticks_start;
         double seconds = ticks_delta / CLOCKS_PER_SEC;
 
-        printf("%.60s:\n        %10.6lfs\n", algorithm_names[alg_i], seconds);
+        printf("                            %10.2lfs\r%.60s:\n", seconds, algorithm_names[alg_i]);
     }
 
     return EXIT_SUCCESS;

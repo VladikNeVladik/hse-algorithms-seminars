@@ -27,7 +27,7 @@ CFLAGS=\
 
 build/search: search.c
 	@mkdir -p build
-	gcc search.c ${CFLAGS} -o build/search
+	@gcc search.c ${CFLAGS} -o build/search
 
 run: build/search
 	@./build/search
