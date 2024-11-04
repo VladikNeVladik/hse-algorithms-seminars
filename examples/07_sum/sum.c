@@ -1,5 +1,4 @@
 // Copyright 2024 Vladislav Aleinik
-
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>

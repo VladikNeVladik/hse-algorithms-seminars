@@ -1,3 +1,4 @@
+// Copyright 2024 Vladislav Aleinik
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>

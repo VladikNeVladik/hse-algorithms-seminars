@@ -1,3 +1,4 @@
+// Copyright 2024 Vladislav Aleinik
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdbool.h>
@@ -356,7 +357,7 @@ int main(void)
 
     for (unsigned alg_i = 0; alg_i < 4; ++alg_i)
     {
-        // Запускаем измерение времени
+        // Начало измеряемого отрезка времени
         clock_t ticks_start = clock();
 
         for (size_t word_i = 0; word_i < sizeof(needles) / sizeof(const char*); ++word_i)
@@ -382,7 +383,7 @@ int main(void)
             }
         }
 
-        // Завершаем измерение времени
+        // Конец измеряемого отрезка времени
         clock_t ticks_end = clock();
 
         double ticks_delta = ticks_end - ticks_start;
