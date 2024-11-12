@@ -140,6 +140,10 @@ const char* retcode_str(RetCode code)
         {
             return "invalid argument";
         }
+        case RET_FILEIO:
+        {
+            return "failed file operation";
+        }
         default:
         {
             return "invalid return code";
