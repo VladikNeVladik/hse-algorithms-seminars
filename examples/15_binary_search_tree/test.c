@@ -1,4 +1,8 @@
 // Copyright 2024 Vladislav Aleinik
+#include <stdint.h>
+
+typedef uint32_t Key_t;
+typedef uint32_t Value_t;
 
 #include "tree.h"
 
@@ -8,67 +12,61 @@
 
 int main(void)
 {
-    // Initialize the search database:
     Tree search_db;
-    tree_init(&search_db);
+    tree_alloc(&search_db);
 
-    // Create a little array of searched elements:
-    key_t saved[NUM_SEARCHED];
+    Key_t saved[NUM_SEARCHED];
 
-    // Fill it with random data:
     for (size_t iteration_i = 0U; iteration_i < NUM_INSERTED; ++iteration_i)
     {
-        // Generate random key and value:
-        key_t key = rand();
-        value_t value = key;
+        Key_t key = rand();
+        Value_t value = key;
 
-        // Add element to the data structure:
         tree_set(&search_db, key, value);
 
-        // Possibly cache element:
         if (iteration_i + NUM_SEARCHED >= NUM_INSERTED)
         {
             saved[iteration_i + NUM_SEARCHED - NUM_INSERTED] = key;
         }
     }
 
-    // Search for saved elements for a couple of times:
     for (size_t search_i = 0U; search_i < NUM_FULL_SEARCHES; ++search_i)
     {
         for (size_t saved_i = 0U; saved_i < NUM_SEARCHED; ++saved_i)
         {
-            key_t search_key = saved[saved_i];
-            value_t found_value = 0U;
+            Key_t search_key = saved[saved_i];
+            Value_t found_value = 0U;
 
-            bool found = tree_search(&search_db, search_key, &found_value);
-            TEST_CONDITION(found,
+            bool found;
+            tree_search(&search_db, search_key, &found_value, &found);
+            verify_contract(found,
                 "[TREE SEARCH] Unable to find an element\n");
-            TEST_CONDITION(search_key == found_value,
+            verify_contract(search_key == found_value,
                 "[TREE SEARCH] Found unexpected value\n");
         }
     }
 
-    // Remove saved elements from the tree:
     for (size_t saved_i = 0U; saved_i < NUM_SEARCHED; ++saved_i)
     {
-        key_t search_key = saved[saved_i];
-        value_t removed_value;
+        Key_t search_key = saved[saved_i];
+        Value_t removed_value;
 
-        bool removed = tree_remove(&search_db, search_key, &removed_value);
-        TEST_CONDITION(removed,
+        bool removed;
+        tree_remove(&search_db, search_key, &removed_value, &removed);
+        verify_contract(removed,
             "[TREE DELETION] Element not found\n");
-        TEST_CONDITION(search_key == removed_value,
+        verify_contract(search_key == removed_value,
             "[TREE DELETION] Found unexpected value\n");
     }
 
-    // Ensure the search fails:
     for (size_t saved_i = 0U; saved_i < NUM_SEARCHED; ++saved_i)
     {
-        key_t search_key = saved[saved_i];
-        value_t found_value;
+        Key_t search_key = saved[saved_i];
+        Value_t found_value;
 
-        bool found = tree_search(&search_db, search_key, &found_value);
-        TEST_CONDITION(!found,
+        bool found;
+        tree_search(&search_db, search_key, &found_value, &found);
+        verify_contract(!found,
             "[TREE FAIL SEARCH] Found spurious element\n");
     }
 
