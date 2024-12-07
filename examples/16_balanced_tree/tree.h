@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "utils.h"
 
@@ -34,6 +35,9 @@ typedef struct {
     Key_t key;
     // Значение узла дерева.
     Value_t value;
+
+    // Высота поддерева, имеющего данный узел как корневой.
+    int32_t height;
 } TreeNode;
 
 // Тип Tree - двоичное дерево поиска.
@@ -136,7 +140,7 @@ RetCode tree_free(Tree* tree)
 //--------------------------------------------------------------------------------------------------
 // Параметры:
 // tree    (in) - бинарное дерево поиска.
-// node_id (in) - идентификатор узла дерева.
+// node_id (in) - валидный идентификатор узла дерева.
 //
 // Возвращаемое значение:
 // Указатель на узел дерева.
@@ -151,6 +155,64 @@ TreeNode* tree_get(Tree* tree, Node_t node_id)
 {
     // Возвращаем узел в массиве по индексу, равному идентификатору узла.
     return &tree->nodes[node_id];
+}
+
+//==================================================================================================
+// Функция: tree_height
+// Назначение: Возвращает высоту поддерева, имеющего заданный узел как корневой.
+//--------------------------------------------------------------------------------------------------
+// Параметры:
+// tree    (in) - бинарное дерево поиска.
+// node_id (in) - идентификатор корневого узла поддерева (валидный идентификатор или NULL_NODE).
+//
+// Возвращаемое значение:
+// Высота поддерева.
+//
+// Используемые внешние переменные:
+// отсутствуют
+//
+// Примечания:
+// отсутствуют
+//==================================================================================================
+int32_t tree_height(Tree* tree, Node_t node_id)
+{
+    if (node_id == NULL_NODE)
+    {
+        return 0;
+    }
+
+    return tree->nodes[node_id].height;
+}
+
+//==================================================================================================
+// Функция: tree_balance_factor
+// Назначение: Возвращает разность высот левого и правого поддеревьев, заданных дочерними узлами
+// заданного узла.
+//--------------------------------------------------------------------------------------------------
+// Параметры:
+// tree    (in) - бинарное дерево поиска.
+// node_id (in) - идентификатор узла (валидный идентификатор или NULL_NODE).
+//
+// Возвращаемое значение:
+// Разность высот левого и правого поддеревьев, заданных дочерними узлами заданного узла.
+//
+// Используемые внешние переменные:
+// отсутствуют
+//
+// Примечания:
+// отсутствуют
+//==================================================================================================
+int32_t tree_balance_factor(Tree* tree, Node_t node_id)
+{
+    if (node_id == NULL_NODE)
+    {
+        return 0;
+    }
+
+    // Узел, соответствующий идентификтору node_id.
+    TreeNode* node = tree_get(tree, node_id);
+
+    return tree_height(tree, node->left_id) - tree_height(tree, node->right_id);
 }
 
 //==================================================================================================
@@ -171,6 +233,7 @@ TreeNode* tree_get(Tree* tree, Node_t node_id)
 // Примечания:
 // - Описание алгоритма можно найти в книге Introduction to Algorithms (Cormen, Leiserson, Rivest,
 //   Stein), в части 12.3 третьего издания.
+// - Балансировка дерева производится на более выооком уровне реализации.
 //==================================================================================================
 void tree_transplant(Tree* tree, Node_t transplanted_id, Node_t new_id)
 {
@@ -258,6 +321,9 @@ RetCode tree_node_allocate(Tree* tree, Node_t* new_node)
     allocated->left_id   = NULL_NODE;
     allocated->right_id  = NULL_NODE;
 
+    // Высота нового узла равна 1.
+    allocated->height = 1;
+
     // Возвращаем узел.
     *new_node = allocated_id;
 
@@ -279,7 +345,7 @@ RetCode tree_node_allocate(Tree* tree, Node_t* new_node)
 // отсутствуют
 //
 // Примечания:
-// отсутствуют
+// - Балансировка дерева производится на более высоком уровне реализации.
 //==================================================================================================
 void tree_node_free(Tree* tree, Node_t freed_id)
 {
@@ -402,6 +468,175 @@ Node_t tree_minimum(Tree* tree, Node_t subtree_id)
     return subtree_id;
 }
 
+//==================================================================================================
+// Функция: tree_rotate_left
+// Назначение: производит левый поворот над заданной вершиной дерева.
+//--------------------------------------------------------------------------------------------------
+// Параметры:
+// tree    (in) - бинарное дерево поиска.
+// node_id (in) - идентификатор корневого узла поддерева (валидный идентификатор или NULL_NODE).
+//
+// Возвращаемое значение:
+// Идентификатор нового корневого узла поддерева.
+//
+// Используемые внешние переменные:
+// отсутствуют
+//
+// Примечания:
+// - Возможно визуализация преобразования, заданного данной функцией.
+//   Здесь узел node задан идентификатором node_id, а узел ret - ret_id.
+/*    node                     ret
+ *    / \                      / \
+ *   T1 ret     ------->     node T3
+ *      / \                  / \
+ *     T2  T3               T1  T2
+ */
+// - Узел node должен иметь правый дочерний узел.
+// - Операция не производит перерассчёта высот для родительских узлов.
+//==================================================================================================
+Node_t tree_rotate_left(Tree* tree, Node_t node_id)
+{
+    // Текущий корневой узел поддерева.
+    TreeNode* node = tree_get(tree, node_id);
+
+    // Идентификатор нового корневого узла поддерева.
+    Node_t ret_id = node->right_id;
+    // Новый корневой узел поддерева.
+    TreeNode* ret = tree_get(tree, ret_id);
+
+    // Идентификатор текущего левого дочернего узла для узла ret.
+    Node_t t2_id = ret->left_id;
+
+    // Идентификатор родительского узла для узла node.
+    Node_t parent_id = node->parent_id;
+
+    // Обновляем связи узла node.
+    node->parent_id = ret_id;
+    node->right_id  = t2_id;
+
+
+    // Обновляем связи узла ret.
+    ret->left_id    = node_id;
+    ret->parent_id  = parent_id;
+
+    // Обновляем высоты обоих узлов.
+    node->height = max(tree_height(tree, node->left_id), tree_height(tree, node->right_id)) + 1;
+    ret->height  = max(node->height, tree_height(tree, ret->right_id)) + 1;
+
+    // Обновляем идентификатор родителя для узла T2.
+    if (t2_id != NULL_NODE)
+    {
+        TreeNode* t2 = tree_get(tree, t2_id);
+
+        t2->parent_id = node_id;
+    }
+
+    // Обновляем идентификатор дочернего узла для родителя узла node.
+    if (parent_id == NULL_NODE)
+    {
+        tree->root_id = ret_id;
+    }
+    else
+    {
+        TreeNode* parent = tree_get(tree, parent_id);
+
+        if (parent->left_id == node_id)
+        {
+            parent->left_id = ret_id;
+        }
+        else
+        {
+            parent->right_id = ret_id;
+        }
+    }
+
+    return ret_id;
+}
+
+//==================================================================================================
+// Функция: tree_rotate_right
+// Назначение: производит правый поворот над заданной вершиной дерева.
+//--------------------------------------------------------------------------------------------------
+// Параметры:
+// tree    (in) - бинарное дерево поиска.
+// node_id (in) - идентификатор корневого узла поддерева (валидный идентификатор или NULL_NODE).
+//
+// Возвращаемое значение:
+// Идентификатор нового корневого узла поддерева.
+//
+// Используемые внешние переменные:
+// отсутствуют
+//
+// Примечания:
+// - Возможно визуализация преобразования, заданного данной функцией.
+//   Здесь узел node задан идентификатором node_id, а узел ret - ret_id.
+/*      node                ret
+ *      / \                 / \
+ *    ret  T3   ------->   T1 node
+ *    / \                     / \
+ *   T1  T2                  T2  T3
+ */
+// - Узел node должен иметь левый дочерний узел.
+// - Операция не производит перерассчёта высот для родительских узлов.
+//==================================================================================================
+Node_t tree_rotate_right(Tree* tree, Node_t node_id)
+{
+    // Текущий корневой узел поддерева.
+    TreeNode* node = tree_get(tree, node_id);
+
+    // Идентификатор нового корневого узла поддерева.
+    Node_t ret_id = node->left_id;
+    // Новый корневой узел поддерева.
+    TreeNode* ret = tree_get(tree, ret_id);
+
+    // Идентификатор текущего правого дочернего узла для узла ret.
+    Node_t t2_id = ret->right_id;
+
+    // Идентификатор родительского узла для узла node.
+    Node_t parent_id = node->parent_id;
+
+    // Обновляем связи узла node.
+    node->parent_id = ret_id;
+    node->left_id = t2_id;
+
+    // Обновляем связи узла ret.
+    ret->parent_id = parent_id;
+    ret->right_id  = node_id;
+
+    // Обновляем высоты обоих узлов.
+    node->height = max(tree_height(tree, node->left_id), tree_height(tree, node->right_id)) + 1;
+    ret->height  = max(node->height, tree_height(tree, ret->left_id)) + 1;
+
+    // Обновляем идентификатор родителя для узла T2.
+    if (t2_id != NULL_NODE)
+    {
+        TreeNode* t2 = tree_get(tree, t2_id);
+
+        t2->parent_id = node_id;
+    }
+
+    // Обновляем идентификатор дочернего узла для родителя узла node.
+    if (parent_id == NULL_NODE)
+    {
+        tree->root_id = ret_id;
+    }
+    else
+    {
+        TreeNode* parent = tree_get(tree, parent_id);
+
+        if (parent->left_id == node_id)
+        {
+            parent->left_id = ret_id;
+        }
+        else
+        {
+            parent->right_id = ret_id;
+        }
+    }
+
+    return ret_id;
+}
+
 // Максимальная глубина печати дерева
 #define MAX_PRINT_DEPTH 40U
 
@@ -449,16 +684,16 @@ void tree_print_recursive(Tree* tree, Node_t node_i, size_t level, int state[MAX
         switch (state[lvl])
         {
             case 0:
-                printf("        ");
+                printf("      ");
                 break;
             case 1:
-                printf("      │ ");
+                printf(" │    ");
                 break;
             case 2:
-                printf("      │ ");
+                printf(" │    ");
                 break;
             case 3:
-                printf("        ");
+                printf("      ");
                 break;
             default: break;
         }
@@ -474,13 +709,13 @@ void tree_print_recursive(Tree* tree, Node_t node_i, size_t level, int state[MAX
         switch (state[level - 1U])
         {
             case 1:
-                printf("      ┌─");
+                printf(" ┌────");
                 break;
             case 2:
-                printf("      └─");
+                printf(" └────");
                 break;
             case 3:
-                printf("        ");
+                printf("      ");
                 break;
             default: break;
         }
@@ -494,11 +729,11 @@ void tree_print_recursive(Tree* tree, Node_t node_i, size_t level, int state[MAX
     // Печатаем текущий узел.
     if (node == NULL)
     {
-        printf("─────0\n");
+        printf("0\n");
     }
     else
     {
-        printf("[%08x]\n", node->key);
+        printf("[%d] (%d)\n", node->key, node->height);
     }
 
     // Рекурсивно печатаем правое поддерево.
@@ -509,6 +744,138 @@ void tree_print_recursive(Tree* tree, Node_t node_i, size_t level, int state[MAX
     }
     state[level] = 3;
 }
+
+// Предварительная декларация функции для печати.
+void tree_print(Tree* tree);
+
+//==================================================================================================
+// Функция: tree_balance
+// Назначение: Производит перебалансировку дерева от нижнего узла к верхнему.
+//--------------------------------------------------------------------------------------------------
+// Параметры:
+// tree        (in) - бинарное дерево поиска.
+// unbalanced_id (in) - идентификатор узла, с которого требуется начинать перебалансировку.
+//
+// Возвращаемое значение:
+// код возврата.
+//
+// Используемые внешние переменные:
+// отсутствуют
+//
+// Примечания:
+// отсутствуют
+//==================================================================================================
+void tree_balance(Tree* tree, Node_t unbalanced_id)
+{
+    if (unbalanced_id == NULL_NODE)
+    {
+        // Для узла-пустышки балансировка уже выполнена.
+        return;
+    }
+
+    // Производим итеративную балансировку дерева.
+    do
+    {
+        // Узел, являющийся текущим кандидатом на перебалансировку.
+        TreeNode* unbalanced = tree_get(tree, unbalanced_id);
+
+        // Родительский узел для итогового поддерева.
+        Node_t parent_id = unbalanced->parent_id;
+
+        // Вычисляем разность высот левого и правого поддеревьев.
+        int32_t balance_factor = tree_balance_factor(tree, unbalanced_id);
+
+        // Проверяем необходимость балансировки.
+        if (balance_factor > 1)
+        {   // Левое поддерево значительно выше правого.
+            // Идентификатор корня левого поддерева.
+            Node_t left_id = unbalanced->left_id;
+
+            // Проверяем баланс левого поддерева.
+            if (tree_balance_factor(tree, left_id) < 0)
+            {
+                // u = unbalanced_id
+                // l = left_id
+                /*     u     >       u
+                 *    / \    >      / \
+                 *   l   T4  >     x   T4
+                 *  / \      >    / \
+                 * T1  x     >   l  T3
+                 *    / \    >  / \
+                 *   T2 T3   > T1 T2
+                 */
+
+                // Производим дополнительный обратный поворот.
+                tree_rotate_left(tree, left_id);
+            }
+
+            // u = unbalanced_id
+            // l = left_id
+            /*       u    >      l
+             *      / \   >     / \
+             *     l   T4 >    /   \
+             *    / \     >   x     u
+             *   x  T3    >  / \   / \
+             *  / \       > T1 T2 T3 T4
+             * T1 T2      >
+             */
+
+            // Производим прямой поворот.
+            tree_rotate_right(tree, unbalanced_id);
+        }
+        else if (balance_factor < -1)
+        {   // Правое поддерево значительно выше левого.
+            // Идентификатор корня правого поддерева.
+            Node_t right_id = unbalanced->right_id;
+
+            // Проверяем баланс правого поддерева.
+            if (tree_balance_factor(tree, right_id) > 0)
+            {
+                // u = unbalanced_id
+                // r = right_id
+                /*    u     >   u
+                 *   / \    >  / \
+                 *  T1  r   > T1  r
+                 *     / \  >    / \
+                 *    x  T4 >   T2  x
+                 *   / \    >      / \
+                 *  T2 T3   >     T3 T4
+                 */
+
+                // Производим дополнительный обратный поворот.
+                tree_rotate_right(tree, right_id);
+            }
+
+            // u = unbalanced_id
+            // r = right_id
+            /*   u       >      r
+             *  / \      >     / \
+             * T1  r     >    /   \
+             *    / \    >   u     x
+             *   T2  x   >  / \   / \
+             *      / \  > T1 T2 T3 T4
+             *     T3 T4 >
+             */
+
+            // Производим прямой поворот.
+            tree_rotate_left(tree, unbalanced_id);
+        }
+        else
+        {
+            // Вычисляем высоту текущего кандидата на перебалансировку.
+            unbalanced->height = max(tree_height(tree, unbalanced->left_id), tree_height(tree, unbalanced->right_id)) + 1;
+        }
+
+        tree_print(tree);
+        printf("\n");
+        sleep(1);
+
+        // Переходим к рассмотрению родительского узла.
+        unbalanced_id = parent_id;
+    }
+    while (unbalanced_id != NULL_NODE);
+}
+
 
 //============================//
 // Пользовательский интерфейс //
@@ -590,6 +957,7 @@ RetCode tree_set(Tree* tree, Key_t key, Value_t value)
         TreeNode* found = tree_get(tree, found_i);
         found->value = value;
 
+        // Структура дерева не изменилась, перебалансировка не требуется.
         return RET_OK;
     }
 
@@ -598,6 +966,7 @@ RetCode tree_set(Tree* tree, Key_t key, Value_t value)
     RetCode ret = tree_node_allocate(tree, &allocated_id);
     if (ret != RET_OK)
     {
+        // Структура дерева не изменилась, перебалансировка не требуется.
         return ret;
     }
 
@@ -625,6 +994,9 @@ RetCode tree_set(Tree* tree, Key_t key, Value_t value)
     allocated->parent_id = parent_id;
     allocated->key       = key;
     allocated->value     = value;
+
+    // Производим балансировку дерева, начиная с добавленного узла.
+    tree_balance(tree, allocated_id);
 
     return RET_OK;
 }
@@ -671,11 +1043,17 @@ RetCode tree_remove(Tree* tree, Key_t key, Value_t* ret, bool* found)
     if (selected->left_id == NULL_NODE)
     {   // У найденного узла отсутствует левый дочерный узел.
         tree_transplant(tree, selected_id, selected->right_id);
+
+        // Выполняем балансировку, начиная с изменённого поддерева.
+        tree_balance(tree, selected_parent_id);
     }
     else if (selected->right_id == NULL_NODE)
     {
         // У найденного узла отсутствует правый дочерный узел.
         tree_transplant(tree, selected_id, selected->left_id);
+
+        // Выполняем балансировку, начиная с изменённого поддерева.
+        tree_balance(tree, selected_parent_id);
     }
     else
     {   // У найденного узла два дочерних узла.
@@ -720,6 +1098,16 @@ RetCode tree_remove(Tree* tree, Key_t key, Value_t* ret, bool* found)
         minimum->left_id = selected->left_id;
         TreeNode* left = tree_get(tree, minimum->left_id);
         left->parent_id = minimum_id;
+
+        // Производим перебалансировку с низшего застронутого узла.
+        if (minimum_parent_id != selected_id)
+        {   // Низшим затронутым узлом является узел с идентификатором minimum_parent_id.
+            tree_balance(tree, minimum_parent_id);
+        }
+        else
+        {   // Низшим затронутым узлом является узел minimum.
+            tree_balance(tree, minimum_id);
+        }
     }
 
     // Возвращаем значение из удаляемого узла.
@@ -749,7 +1137,7 @@ RetCode tree_remove(Tree* tree, Key_t key, Value_t* ret, bool* found)
 //==================================================================================================
 void tree_print(Tree* tree)
 {
-    int state[MAX_PRINT_DEPTH] = {};
+    int state[MAX_PRINT_DEPTH + 1U] = {};
 
     Node_t root_id = tree->root_id;
     tree_print_recursive(tree, root_id, 0U, state);

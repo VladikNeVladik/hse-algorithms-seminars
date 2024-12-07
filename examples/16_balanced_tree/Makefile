@@ -34,9 +34,11 @@ build/test: test.c $(INCLUDES)
 	gcc test.c ${CFLAGS} -o build/test
 
 run: build/test
+	@mkdir -p res
 	@./build/test
 
 clean:
+	@rm -rf res
 	@rm -rf build
 
 .PHONY: run clean
