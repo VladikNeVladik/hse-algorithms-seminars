@@ -11,7 +11,6 @@ endif
 # Compilation flags:
 CFLAGS += \
 	-O2                          \
-	-Wall                        \
 	-Werror                      \
 	-Wformat-security            \
 	-Wignored-qualifiers         \
@@ -99,46 +98,77 @@ VERDICT_INAPT = "$(BYELLOW)[INAPT]$(RESET)\n"
 VERDICT_OK    = "$(BGREEN)[OK]$(RESET)\n"
 VERDICT_ERR   = "$(BRED)[ERR]$(RESET)\n"
 
-OUTPUTS_TEST   = $(TESTS:%=build/%.output.test)
-OUTPUTS_TIME   = $(TESTS:%=build/%.output.time)
-OUTPUTS_MEMORY = $(TESTS:%=build/%.output.memory)
+OUTPUTS_TEST   = $(TESTS:%=build/%.ans.test)
+OUTPUTS_TIME   = $(TESTS:%=build/%.ans.time)
+OUTPUTS_MEMORY = $(TESTS:%=build/%.ans.memory)
+OUTPUTS_IO_BIN = $(TESTS:%=build/%.ans.io-bin)
+OUTPUTS_BIN_IO = $(TESTS:%=build/%.ans.bin-io)
 
-test:   verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TEST)   FORCE
-time:   verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TIME)   FORCE
-memory: verify-input-program $(PROGRAM_BIN) $(OUTPUTS_MEMORY) FORCE
+test:        verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TEST)   FORCE
+time:        verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TIME)   FORCE
+memory:      verify-input-program $(PROGRAM_BIN) $(OUTPUTS_MEMORY) FORCE
+test-io-bin: verify-input-program $(PROGRAM_BIN) $(OUTPUTS_IO_BIN) FORCE
+test-bin-io: verify-input-program $(PROGRAM_BIN) $(OUTPUTS_BIN_IO) FORCE
 
-build/%.output.test: tests/%.input $(PROGRAM_BIN) FORCE
+build/%.ans.test: tests/%.dat $(PROGRAM_BIN) FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Run test $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
 	@$(PROGRAM_BIN) < $< > $@ | cat
-	@if [ ! -f tests/$*.output ]; then \
+	@if [ ! -f tests/$*.ans ]; then \
 		printf $(VERDICT_INAPT); \
-	elif cmp -s tests/$*.output $@; then \
+	elif cmp -s tests/$*.ans $@; then \
 		printf $(VERDICT_OK); \
 	else \
 		printf $(VERDICT_ERR); \
 	fi
 
-build/%.output.time: tests/%.input $(PROGRAM_BIN) FORCE
+build/%.ans.time: tests/%.dat $(PROGRAM_BIN) FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Measure time on $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
 	@$(TIME_CMD) --quiet --format=$(TIME_FORMAT) $(PROGRAM_BIN) < $< > $@ | cat
-	@if [ ! -f tests/$*.output ]; then \
+	@if [ ! -f tests/$*.ans ]; then \
 		printf $(VERDICT_INAPT); \
-	elif cmp -s tests/$*.output $@; then \
+	elif cmp -s tests/$*.ans $@; then \
 		printf $(VERDICT_OK); \
 	else \
 		printf $(VERDICT_ERR); \
 	fi
 
-build/%.output.memory: tests/%.input $(PROGRAM_BIN) FORCE
+build/%.ans.memory: tests/%.dat $(PROGRAM_BIN) FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Limit memory ($(BCYAN)$(MAX_MEMORY)$(BYELLOW))"\
 	" on $(BCYAN)$*$(BYELLOW) for \033[1;36m$(PROGRAM)$(RESET)\n"
 	@prlimit --data=$(MAX_MEMORY) $(PROGRAM_BIN) < $< > $@ | cat
-	@if [ ! -f tests/$*.output ]; then \
+	@if [ ! -f tests/$*.ans ]; then \
 		printf $(VERDICT_INAPT); \
-	elif cmp -s tests/$*.output $@; then \
+	elif cmp -s tests/$*.ans $@; then \
+		printf $(VERDICT_OK); \
+	else \
+		printf $(VERDICT_ERR); \
+	fi
+
+build/%.ans.io-bin: tests/%.dat $(PROGRAM_BIN) FORCE
+	@mkdir -p build
+	@printf "$(BYELLOW)Run test $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
+	@$(PROGRAM_BIN) < $< | cat
+	@mv output.bin $@
+	@if [ ! -f tests/$*.ans ]; then \
+		printf $(VERDICT_INAPT); \
+	elif cmp -s tests/$*.ans $@; then \
+		printf $(VERDICT_OK); \
+	else \
+		printf $(VERDICT_ERR); \
+	fi
+
+build/%.ans.bin-io: tests/%.dat $(PROGRAM_BIN) FORCE
+	@mkdir -p build
+	@printf "$(BYELLOW)Run test $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
+	@cp tests/$*.dat input.bin
+	@$(PROGRAM_BIN) > $@ | cat
+	@rm input.bin
+	@if [ ! -f tests/$*.ans ]; then \
+		printf $(VERDICT_INAPT); \
+	elif cmp -s tests/$*.ans $@; then \
 		printf $(VERDICT_OK); \
 	else \
 		printf $(VERDICT_ERR); \
@@ -155,7 +185,7 @@ build/%: %.c FORCE
 
 clean: FORCE
 	@rm -rf build
-	@rm -f tests/*-gen.input
+	@rm -f tests/*-gen.dat
 
 #================================#
 # Contest manipulation utilities #
@@ -163,6 +193,6 @@ clean: FORCE
 
 clean-all: FORCE
 	@rm -rf ../../contest-*/problem-*/build
-	@rm  -f ../../contest-*/problem-*/tests/*-gen.input
+	@rm  -f ../../contest-*/problem-*/tests/*-gen.dat
 
 .PHONY: test clean FORCE

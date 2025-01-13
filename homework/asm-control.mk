@@ -100,46 +100,46 @@ VERDICT_INAPT = "$(BYELLOW)[INAPT]$(RESET)\n"
 VERDICT_OK    = "$(BGREEN)[OK]$(RESET)\n"
 VERDICT_ERR   = "$(BRED)[ERR]$(RESET)\n"
 
-OUTPUTS_TEST   = $(TESTS:%=build/%.output.test)
-OUTPUTS_TIME   = $(TESTS:%=build/%.output.time)
-OUTPUTS_MEMORY = $(TESTS:%=build/%.output.memory)
+OUTPUTS_TEST   = $(TESTS:%=build/%.ans.test)
+OUTPUTS_TIME   = $(TESTS:%=build/%.ans.time)
+OUTPUTS_MEMORY = $(TESTS:%=build/%.ans.memory)
 
 test:   verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TEST)   FORCE
 time:   verify-input-program $(PROGRAM_BIN) $(OUTPUTS_TIME)   FORCE
 memory: verify-input-program $(PROGRAM_BIN) $(OUTPUTS_MEMORY) FORCE
 
-build/%.output.test: tests/%.input $(PROGRAM_BIN) FORCE
+build/%.ans.test: tests/%.dat $(PROGRAM_BIN) FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Run test $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
 	@$(PROGRAM_BIN) < $< > $@ | cat
-	@if [ ! -f tests/$*.output ]; then \
+	@if [ ! -f tests/$*.ans ]; then \
 		printf $(VERDICT_INAPT); \
-	elif cmp -s tests/$*.output $@; then \
+	elif cmp -s tests/$*.ans $@; then \
 		printf $(VERDICT_OK); \
 	else \
 		printf $(VERDICT_ERR); \
 	fi
 
-build/%.output.time: tests/%.input $(PROGRAM_BIN) FORCE
+build/%.ans.time: tests/%.dat $(PROGRAM_BIN) FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Measure time on $(BCYAN)$*$(BYELLOW) for solution $(BCYAN)$(PROGRAM)$(RESET)\n"
 	@$(TIME_CMD) --quiet --format=$(TIME_FORMAT) $(PROGRAM_BIN) < $< > $@ | cat
-	@if [ ! -f tests/$*.output ]; then \
+	@if [ ! -f tests/$*.ans ]; then \
 		printf $(VERDICT_INAPT); \
-	elif cmp -s tests/$*.output $@; then \
+	elif cmp -s tests/$*.ans $@; then \
 		printf $(VERDICT_OK); \
 	else \
 		printf $(VERDICT_ERR); \
 	fi
 
-build/%.output.memory: tests/%.input $(PROGRAM_BIN) FORCE
+build/%.ans.memory: tests/%.dat $(PROGRAM_BIN) FORCE
 	@mkdir -p build
 	@printf "$(BYELLOW)Limit memory ($(BCYAN)$(MAX_MEMORY)$(BYELLOW))"\
 	" on $(BCYAN)$*$(BYELLOW) for \033[1;36m$(PROGRAM)$(RESET)\n"
 	@prlimit --data=$(MAX_MEMORY) $(PROGRAM_BIN) < $< > $@ | cat
-	@if [ ! -f tests/$*.output ]; then \
+	@if [ ! -f tests/$*.ans ]; then \
 		printf $(VERDICT_INAPT); \
-	elif cmp -s tests/$*.output $@; then \
+	elif cmp -s tests/$*.ans $@; then \
 		printf $(VERDICT_OK); \
 	else \
 		printf $(VERDICT_ERR); \
