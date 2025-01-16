@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <thread>
 
 #include <unistd.h>
 
@@ -17,11 +18,54 @@ const unsigned FPS = 5U;
 const useconds_t FRAME_US = 1000*1000/FPS;
 const size_t MAX_ITERATIONS = 4*4*4;
 
+// Функция вычисления цветов фрактала.
+void compute_fractal_colors(
+    uint32_t* colors, int thread_i, int num_threads,
+    double screen_x, double screen_y, double zoom)
+{
+    for (int i_x = thread_i * WIDTH/num_threads;
+        i_x < (thread_i+1) * WIDTH/num_threads; i_x += 1)
+    {
+        for (int i_y = 0; i_y < HEIGHT; ++i_y)
+        {
+            double x0 = screen_x + (i_x -  WIDTH/2) * zoom;
+            double y0 = screen_y + (i_y - HEIGHT/2) * zoom;
+
+            double x = 0.0;
+            double y = 0.0;
+            double x2 = 0.0;
+            double y2 = 0.0;
+
+            // Вычисляем номер цвета в палитре.
+            size_t iteration = 0;
+            while (x2 + y2 <= 4 && iteration < MAX_ITERATIONS)
+            {
+                y  = 2 * x * y + y0;
+                x  = x2 - y2 + x0;
+                x2 = x * x;
+                y2 = y * y;
+                iteration++;
+            }
+
+            uint32_t color =
+                ((iteration & 0x30) << 18) |
+                ((iteration & 0x0C) << 12) |
+                ((iteration & 0x03) <<  6);
+
+            // Выставляем пиксель нужного цвета.
+            colors[i_x * HEIGHT + i_y] = color;
+        }
+    }
+}
+
 int main()
 {
     // Создаём и инициализируем рендерер.
     Renderer renderer;
     renderer.init(WIDTH, HEIGHT, "Fractal");
+
+    // Аллоцируем массив цветов в динамической памяти.
+    uint32_t* colors = new uint32_t[WIDTH * HEIGHT];
 
     // Текущие координаты и размер пикселя.
     double screen_x = 0.0;
@@ -75,39 +119,39 @@ int main()
         screen_y += v_y;
         zoom *= scale;
 
-        // Вычисляем значения цветов фрактала.
+        // Количество потоков для вычисления карты пикселей.
+        int num_threads = std::thread::hardware_concurrency();
+
+        // Массив идентификаторов потоков.
+        std::thread threads[num_threads - 1];
+
+        // Создаём потоки для вычисления частей карты пикселей.
+        for (int thread_i = 1; thread_i < num_threads; ++thread_i)
+        {
+            threads[thread_i - 1] = std::thread(
+                compute_fractal_colors, colors, thread_i, num_threads,
+                screen_x, screen_y, zoom);
+        }
+
+        // Производим вычисление для нулевого потока.
+        compute_fractal_colors(colors, 0, num_threads, screen_x, screen_y, zoom);
+
+        // Ожидаем завершения всех остальных потоков.
+        for (auto& thread : threads)
+        {
+            thread.join();
+        }
+
+        // Очищаем экран перед отрисовкой.
         renderer.clear_screen();
 
+        // Вычисляем значения цветов фрактала.
         for (int i_x = 0; i_x < WIDTH; ++i_x)
         {
             for (int i_y = 0; i_y < HEIGHT; ++i_y)
             {
-                double x0 = screen_x + (i_x -  WIDTH/2) * zoom;
-                double y0 = screen_y + (i_y - HEIGHT/2) * zoom;
-
-                double x = 0.0;
-                double y = 0.0;
-                double x2 = 0.0;
-                double y2 = 0.0;
-
-                // Вычисляем номер цвета в палитре.
-                size_t iteration = 0;
-                while (x2 + y2 <= 4 && iteration < MAX_ITERATIONS)
-                {
-                    y  = 2 * x * y + y0;
-                    x  = x2 - y2 + x0;
-                    x2 = x * x;
-                    y2 = y * y;
-                    iteration++;
-                }
-
-                uint32_t color =
-                    ((iteration & 0x30) << 18) |
-                    ((iteration & 0x0C) << 12) |
-                    ((iteration & 0x03) <<  6);
-
                 // Выставляем пиксль нужного цвета.
-                renderer.set_pixel(i_x, i_y, color);
+                renderer.set_pixel(i_x, i_y, colors[i_x * HEIGHT + i_y]);
             }
         }
 
@@ -126,6 +170,9 @@ int main()
         // Ожидаем начала следующего кадра.
         usleep(FRAME_US - delta_us);
     }
+
+    // Освобождаем массив цветов.
+    delete[] colors;
 
     // Удаляем рендерер.
     renderer.destroy();

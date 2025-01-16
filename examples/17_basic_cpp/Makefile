@@ -11,11 +11,12 @@ CFLAGS = \
 	-std=c++17 \
 	-Wall      \
 	-Wextra    \
-	-Werror
+	-Werror    \
+	-pthread
 
 # Linker flags:
 # NOTE: it is sometimes required to link to math library.
-# LDFLAGS =
+LDFLAGS = -pthread
 LIBS=-lX11 -lXext
 
 # Select build mode:
