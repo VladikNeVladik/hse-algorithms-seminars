@@ -1,4 +1,4 @@
-# No copyright. Vladislav Alenik, 2024
+# Copyright 2025 Vladislav Aleinik
 
 #-----------------------
 # Compiler/linker flags
@@ -11,8 +11,7 @@ CFLAGS = \
 	-std=c++17 \
 	-Wall      \
 	-Wextra    \
-	-Werror    \
-	-pthread
+	-Werror
 
 # Linker flags:
 # NOTE: it is sometimes required to link to math library.

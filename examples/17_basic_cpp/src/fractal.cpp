@@ -1,4 +1,4 @@
-// Copyright 2024 Vladislav Aleinik
+// Copyright 2025 Vladislav Aleinik
 
 #include <cstdlib>
 #include <ctime>
