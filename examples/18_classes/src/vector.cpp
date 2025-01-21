@@ -1,10 +1,11 @@
-// No copyright. Vladislav Alenik, 2024
-
-#include <vector.hpp>
-
+// Copyright 2025 Vladislav Aleinik
 #include <cassert>
 #include <cstring>
 #include <cmath>
+
+#include <vector.hpp>
+
+#include <utils.hpp>
 
 using Vector = VectorArithmetics::Vector;
 

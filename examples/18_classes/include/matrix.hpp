@@ -1,5 +1,4 @@
-// Copyright 2024 Vladislav Aleinik
-//=======================================
+// Copyright 2025 Vladislav Aleinik
 #ifndef HEADER_GUARD_MATRIX_HPP_INCLUDED
 #define HEADER_GUARD_MATRIX_HPP_INCLUDED
 

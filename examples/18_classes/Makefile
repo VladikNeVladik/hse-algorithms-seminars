@@ -83,7 +83,7 @@ INCLUDES = \
 	include/vector.hpp
 
 # Добавляем директорию include в качестве дополнительной директории для поиска заголовочных файлов.
-CFLAGS += -I $(abspath include)
+CXXFLAGS += -I $(abspath include)
 
 # Список файлов реализации.
 SOURCES = \
@@ -120,7 +120,7 @@ $(EXECUTABLE): $(OBJECTS)
 build/%.o: src/%.cpp $(INCLUDES)
 	@printf "$(BYELLOW)Building object file $(BCYAN)$@$(RESET)\n"
 	@mkdir -p build
-	$(CXX) -c $< $(CFLAGS) -o $@
+	$(CXX) -c $< $(CXXFLAGS) -o $@
 
 #----------------------
 # Вспомогательные цели

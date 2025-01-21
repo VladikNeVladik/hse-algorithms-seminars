@@ -1,11 +1,8 @@
 // Copyright 2025 Vladislav Aleinik
-//=======================================
 #ifndef HEADER_GUARD_VECTOR_HPP_INCLUDED
 #define HEADER_GUARD_VECTOR_HPP_INCLUDED
 
 #include <cstdlib>
-
-#include <utils.hpp>
 
 namespace VectorArithmetics
 {
@@ -30,6 +27,8 @@ namespace VectorArithmetics
 
     private:
         // Поля класса.
+        // Инвариант структуры данных:
+        // - Указатель data_ указывает на выделенную область динмамической память размера size_.
         double* data_;
         size_t size_;
     };

@@ -3,6 +3,8 @@
 
 #include <iostream>
 
+#include <utils.hpp>
+
 constexpr size_t SIZE = 100U;
 
 int main(void)

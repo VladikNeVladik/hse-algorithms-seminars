@@ -1,5 +1,4 @@
 // Copyright 2025 Vladislav Aleinik
-//=======================================
 #ifndef HEADER_GUARD_UTILS_HPP_INCLUDED
 #define HEADER_GUARD_UTILS_HPP_INCLUDED
 
