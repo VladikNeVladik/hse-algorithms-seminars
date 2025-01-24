@@ -13,17 +13,26 @@ namespace MatrixArithmetics
     class Matrix
     {
     public:
-        // Конструктор и деструктор.
+        // Конструкторы и деструктор.
         Matrix(size_t size_x, size_t size_y);
         Matrix(const std::string& filename);
+
+        Matrix(const Matrix& that);
+
         ~Matrix();
 
+        // Копирование объектов.
+        Matrix& operator=(const Matrix& that);
+
+        // Доступ к элементам матрицы.
+        Vector& operator[](size_t index);
+
         // Арифметические операции.
-        Matrix& add(const Matrix& that);
+        Matrix& operator+=(const Matrix& that);
 
         // Операции сравнения.
-        bool equal(const Matrix& that) const;
-        bool not_equal() const;
+        bool operator==(const Matrix& that) const;
+        bool operator!=(const Matrix& that) const;
 
         // Запись матрицы в файл.
         Matrix& dump_to_file(const std::string& filename);
@@ -34,7 +43,7 @@ namespace MatrixArithmetics
         size_t size_y_;
     };
 
-    Matrix sum(const Matrix& first, const Matrix& second);
+    Matrix operator+(const Matrix& first, const Matrix& second);
 
 }; // namespace MatrixArithmetics
 
