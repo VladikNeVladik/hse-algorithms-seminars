@@ -63,14 +63,12 @@ Vector& Vector::operator=(const Vector& that)
     // Производим реаллокацию имеющегося диапозона памяти.
     if (data_ != nullptr)
     {
-        data_ = (double*) std::realloc(data_, that.size_);
-    }
-    else
-    {
-        data_ = new double[that.size_];
+        delete[] data_;
     }
 
-    // Копируем размер и содержимое массива.
+    data_ = new double[that.size_];
+
+    // Копируем размер.
     size_ = that.size_;
 
     // Производим глубокое копирование элементов.
