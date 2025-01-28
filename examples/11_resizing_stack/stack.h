@@ -238,20 +238,12 @@ StackRetCode stack_free(struct Stack* stack)
 //==================================================================================================
 StackRetCode stack_resize(struct Stack* stack, size_t new_capacity)
 {
-    // Проверяем состояние стека
-    StackRetCode ret = stack_ok(stack);
-    if (ret != STACK_OK)
-    {
-        return ret;
-    }
-
     // Перевыделяем память под элементы стека
     data_t* new_array = realloc(stack->array, new_capacity * sizeof(data_t));
     if (new_array == NULL)
     {
         return STACK_NOMEM;
     }
-
 
     // Вычисляем количество элементов в новом стеке
     size_t new_size = MIN(stack->size, new_capacity);
